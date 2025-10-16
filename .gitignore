@@ -1,0 +1,5 @@
+merge_sort/.vscode/*
+merge_sort/build/*
+
+merge_sort/bin/*
+!merge_sort/bin/.gitkeep
