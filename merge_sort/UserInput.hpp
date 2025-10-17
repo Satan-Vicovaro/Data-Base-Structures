@@ -8,4 +8,5 @@ enum UserInput {
   NOTHING,
   GENERATE_RANDOM_DATA,
   LOAD_DATA_FROM_FILE,
+  SORT_DATA
 };

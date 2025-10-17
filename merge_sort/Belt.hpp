@@ -8,29 +8,36 @@
 #include <filesystem>
 #include <fstream>
 #include <ios>
+#include <iosfwd>
 #include <iostream>
+#include <iterator>
 #include <random>
 #include <shared_mutex>
 #include <string>
 #include <string_view>
+#include <tuple>
 #include <vector>
 
 class Belt {
 private:
-  int file_num_;
   std::string belt_name_;
-  std::fstream file_stream_;
   std::string file_name_;
+
+  int current_chunk_number_;
+  std::fstream file_stream_;
+  std::streampos last_stream_pos_;
 
 public:
   Belt() {
-    file_num_ = 0;
+    current_chunk_number_ = 0;
+    last_stream_pos_ = 0;
     belt_name_ = "output/default_name";
     file_name_ = std::string(belt_name_ + ".txt");
   }
 
   Belt(std::string_view string_name) {
-    file_num_ = 0;
+    current_chunk_number_ = 0;
+    last_stream_pos_ = 0;
     belt_name_ = std::string(string_name);
     file_name_ = "output/" + std::string(string_name) + ".txt";
   }
@@ -166,5 +173,34 @@ public:
       }
       cur_index++;
     }
+  }
+
+  std::tuple<std::vector<Record>, bool> get_next_chunk() {
+    int element_counter = 0;
+    std::vector<Record> return_records = {};
+    std::string line = "";
+    bool end_of_file = false;
+
+    file_stream_.open(file_name_, std::ios::out);
+
+    file_stream_.seekg(last_stream_pos_);
+
+    while (element_counter >= config::in_memory_chunk_element_count ||
+           !end_of_file) {
+      if (!std::getline(file_stream_, line)) {
+        end_of_file = true;
+      }
+      return_records.emplace_back(Record(line));
+      element_counter++;
+    }
+    if (end_of_file) {
+      current_chunk_number_ = 0;
+      last_stream_pos_ = 0;
+    } else {
+      current_chunk_number_++;
+      last_stream_pos_ = file_stream_.tellg();
+    }
+    file_stream_.close();
+    return std::make_tuple(return_records, end_of_file);
   }
 };

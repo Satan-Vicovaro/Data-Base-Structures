@@ -4,6 +4,8 @@
 #include <cctype>
 #include <iostream>
 #include <random>
+#include <tuple>
+#include <vector>
 
 class SuperDataBase {
 private:
@@ -40,7 +42,8 @@ public:
         break;
       case UserInput::DISPLAY_INFO:
         std::cout << "a - add row\nq - quit\nh - help\ns - show data base\n"
-                     "g - generate random data\n f - load data from file\n";
+                     "g - generate random data\nf - load data from file\n"
+                     "r - sort data\n";
         break;
       case UserInput::GENERATE_RANDOM_DATA:
         std::cout << "How many records?\n";
@@ -50,12 +53,24 @@ public:
       case UserInput::LOAD_DATA_FROM_FILE:
         main_belt_.load_data_from_file();
         break;
+      case UserInput::SORT_DATA:
+        sort_data_base();
+        break;
       }
     }
     return 0;
   }
 
-  void show_data_base() {}
+  void sort_data_base() {
+    // phase 1, sort chunks in memory
+    bool end_of_chunks = false;
+    while (!end_of_chunks) {
+      std::tuple<std::vector<Record>, bool> result_val =
+          main_belt_.get_next_chunk();
+      end_of_chunks = std::get<1>(result_val);
+      std::vector<Record> chunk = std::get<0>(result_val);
+    }
+  }
 
   UserInput getUserInput() {
     char input_char = 0;
@@ -75,6 +90,8 @@ public:
       return UserInput::GENERATE_RANDOM_DATA;
     case ('f'):
       return UserInput::LOAD_DATA_FROM_FILE;
+    case ('r'):
+      return UserInput::SORT_DATA;
     }
     return UserInput::NOTHING;
   }
