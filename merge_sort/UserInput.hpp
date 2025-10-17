@@ -1,3 +1,11 @@
 #pragma once
 
-enum UserInput { QUIT, ADD_ROW, SHOW_DATA_BASE, DISPLAY_INFO, NOTHING };
+enum UserInput {
+  QUIT,
+  ADD_ROW,
+  SHOW_DATA_BASE,
+  DISPLAY_INFO,
+  NOTHING,
+  GENERATE_RANDOM_DATA,
+  LOAD_DATA_FROM_FILE,
+};
