@@ -3,41 +3,60 @@
 #include "UserInput.hpp"
 #include <cctype>
 #include <iostream>
+#include <random>
 
 class SuperDataBase {
 private:
   Belt main_belt_;
+  std::mt19937 mt_;
 
 public:
-  SuperDataBase() { main_belt_ = Belt("main_belt"); }
-  SuperDataBase(SuperDataBase &&) = default;
-  SuperDataBase &operator=(SuperDataBase &&) = default;
-  ~SuperDataBase();
-
+  SuperDataBase() {
+    main_belt_ = Belt("main_belt");
+    main_belt_.init();
+    std::mt19937 mt_(time(nullptr));
+  }
   int start() {
+
+    std::cout << "type 'h' for help\n";
     bool quit = false;
+    int record_num = 0;
     while (!quit) {
       UserInput input = getUserInput();
       switch (input) {
       case UserInput::QUIT:
         quit = true;
         break;
-
       case UserInput::SHOW_DATA_BASE:
-        quit = true;
+        main_belt_.print_whole_file();
         break;
-
       case UserInput::ADD_ROW:
-        quit = true;
+        std::cout << "how many rows?\n";
+        std::cin >> record_num;
+        main_belt_.add_records_from_user(record_num);
         break;
-
       case UserInput::NOTHING:
-        quit = true;
+        std::cout << "not a valid command\n";
+        break;
+      case UserInput::DISPLAY_INFO:
+        std::cout << "a - add row\nq - quit\nh - help\ns - show data base\n"
+                     "g - generate random data\n f - load data from file\n";
+        break;
+      case UserInput::GENERATE_RANDOM_DATA:
+        std::cout << "How many records?\n";
+        std::cin >> record_num;
+        main_belt_.generate_radom_data(mt_, record_num);
+        break;
+      case UserInput::LOAD_DATA_FROM_FILE:
+        main_belt_.load_data_from_file();
         break;
       }
     }
     return 0;
   }
+
+  void show_data_base() {}
+
   UserInput getUserInput() {
     char input_char = 0;
     std::cout << "Waiting for input\n";
@@ -52,6 +71,10 @@ public:
       return UserInput::DISPLAY_INFO;
     case ('s'):
       return UserInput::SHOW_DATA_BASE;
+    case ('g'):
+      return UserInput::GENERATE_RANDOM_DATA;
+    case ('f'):
+      return UserInput::LOAD_DATA_FROM_FILE;
     }
     return UserInput::NOTHING;
   }

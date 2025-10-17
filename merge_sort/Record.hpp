@@ -1,4 +1,5 @@
 #pragma once
+#include "Config.hpp"
 #include <cstdio>
 #include <random>
 #include <string>
@@ -50,8 +51,8 @@ public:
     std::vector<Record> return_val;
     for (int j = 0; j < record_num; j++) {
 
-      std::string record_data = std::string(10, 'C');
-      for (int i = 0; i < 10; i++) {
+      std::string record_data = std::string(config::record_char_size, 'C');
+      for (int i = 0; i < config::record_char_size; i++) {
         record_data[i] = (char)('!' + (generator() % ('~' - '!')));
       }
       return_val.emplace_back(Record(record_data));
