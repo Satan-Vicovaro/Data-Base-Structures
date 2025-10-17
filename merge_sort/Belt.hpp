@@ -10,6 +10,7 @@
 #include <ios>
 #include <iostream>
 #include <random>
+#include <shared_mutex>
 #include <string>
 #include <string_view>
 #include <vector>
@@ -24,14 +25,14 @@ private:
 public:
   Belt() {
     file_num_ = 0;
-    belt_name_ = "default_name";
+    belt_name_ = "output/default_name";
     file_name_ = std::string(belt_name_ + ".txt");
   }
 
   Belt(std::string_view string_name) {
     file_num_ = 0;
     belt_name_ = std::string(string_name);
-    file_name_ = std::string(string_name) + ".txt";
+    file_name_ = "output/" + std::string(string_name) + ".txt";
   }
   void init() {
     file_stream_.open(file_name_);
