@@ -1,9 +1,11 @@
 #pragma once
 #include "Belt.hpp"
 #include "UserInput.hpp"
+#include <algorithm>
 #include <cctype>
 #include <iostream>
 #include <random>
+#include <string>
 #include <tuple>
 #include <vector>
 
@@ -67,8 +69,17 @@ public:
     while (!end_of_chunks) {
       std::tuple<std::vector<Record>, bool> result_val =
           main_belt_.get_next_chunk();
+
       end_of_chunks = std::get<1>(result_val);
+
       std::vector<Record> chunk = std::get<0>(result_val);
+      std::sort(chunk.begin(), chunk.end());
+
+      main_belt_.save_next_chunk(chunk);
+
+      for (Record record : chunk) {
+        record.print();
+      }
     }
   }
 

@@ -1,9 +1,11 @@
 #pragma once
 #include "Config.hpp"
 #include <cstdio>
+#include <iostream>
 #include <random>
 #include <string>
 #include <string_view>
+#include <system_error>
 #include <vector>
 class Record {
 private:
@@ -58,6 +60,15 @@ public:
       return_val.emplace_back(Record(record_data));
     }
     return return_val;
+  }
+
+  void into_file_string(char &buffer, int &buffsize) {
+    if (record_.size() > buffsize) {
+      std::cout << "record size if bigger than buffsize, skipping string\n";
+      return;
+    }
+    record_.copy(&buffer, record_.size());
+    buffsize = record_.size();
   }
 
   bool operator==(const Record &other) const {

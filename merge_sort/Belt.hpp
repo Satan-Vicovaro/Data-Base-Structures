@@ -25,12 +25,14 @@ private:
 
   int current_chunk_number_;
   std::fstream file_stream_;
+  std::streampos prev_chunk_stream_pos_;
   std::streampos last_stream_pos_;
 
 public:
   Belt() {
     current_chunk_number_ = 0;
     last_stream_pos_ = 0;
+    prev_chunk_stream_pos_ = 0;
     belt_name_ = "output/default_name";
     file_name_ = std::string(belt_name_ + ".txt");
   }
@@ -38,6 +40,7 @@ public:
   Belt(std::string_view string_name) {
     current_chunk_number_ = 0;
     last_stream_pos_ = 0;
+    prev_chunk_stream_pos_ = 0;
     belt_name_ = std::string(string_name);
     file_name_ = "output/" + std::string(string_name) + ".txt";
   }
@@ -181,18 +184,22 @@ public:
     std::string line = "";
     bool end_of_file = false;
 
-    file_stream_.open(file_name_, std::ios::out);
+    file_stream_.open(file_name_);
 
     file_stream_.seekg(last_stream_pos_);
+    prev_chunk_stream_pos_ = last_stream_pos_;
 
-    while (element_counter >= config::in_memory_chunk_element_count ||
+    while (element_counter < config::in_memory_chunk_element_count &&
            !end_of_file) {
+
       if (!std::getline(file_stream_, line)) {
         end_of_file = true;
+      } else {
+        return_records.emplace_back(Record(line));
+        element_counter++;
       }
-      return_records.emplace_back(Record(line));
-      element_counter++;
     }
+
     if (end_of_file) {
       current_chunk_number_ = 0;
       last_stream_pos_ = 0;
@@ -200,7 +207,21 @@ public:
       current_chunk_number_++;
       last_stream_pos_ = file_stream_.tellg();
     }
+
     file_stream_.close();
+
     return std::make_tuple(return_records, end_of_file);
+  }
+
+  void save_next_chunk(std::vector<Record> &records) {
+    std::string buffer = std::string();
+    for (Record record : records) {
+      buffer.append(record.getRecord());
+      buffer.push_back('\n');
+    }
+    file_stream_.open(file_name_);
+    file_stream_.seekg(prev_chunk_stream_pos_);
+    file_stream_.write(buffer.c_str(), buffer.length());
+    file_stream_.close();
   }
 };
