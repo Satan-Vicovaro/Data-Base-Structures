@@ -1,8 +1,11 @@
 #pragma once
 #include "Belt.hpp"
+#include "Config.hpp"
+#include "RunGenerator.hpp"
 #include "UserInput.hpp"
 #include <algorithm>
 #include <cctype>
+#include <fstream>
 #include <iostream>
 #include <random>
 #include <string>
@@ -13,12 +16,14 @@ class SuperDataBase {
 private:
   Belt main_belt_;
   std::mt19937 mt_;
+  RunGenerator run_generator_;
 
 public:
   SuperDataBase() {
     main_belt_ = Belt("main_belt");
     main_belt_.init();
     std::mt19937 mt_(time(nullptr));
+    run_generator_ = RunGenerator();
   }
   int start() {
 
@@ -81,6 +86,13 @@ public:
         record.print();
       }
     }
+    // phase 2, start merging parts
+
+    std::fstream &file_stream = main_belt_.get_opened_stream();
+    auto tuple = run_generator_.get_runs(config::max_buffer_count, file_stream);
+    std::vector<Run> runs = std::get<0>(tuple);
+    bool end_of_file = std::get<1>(tuple);
+    main_belt_.close_opened_stream();
   }
 
   UserInput getUserInput() {
