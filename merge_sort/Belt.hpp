@@ -44,6 +44,7 @@ public:
     belt_name_ = std::string(string_name);
     file_name_ = "output/" + std::string(string_name) + ".txt";
   }
+
   void init() {
     file_stream_.open(file_name_);
     if (file_stream_.peek() != std::ifstream::traits_type::eof()) {
@@ -67,6 +68,16 @@ public:
           std::cout << "Wrong input\n";
         }
       }
+    }
+    file_stream_.close();
+  }
+  std::fstream &get_opened_stream() {
+    file_stream_.open(file_name_);
+    return file_stream_;
+  }
+  void close_opened_stream() {
+    if (!file_stream_.is_open()) {
+      std::cout << "closing stream which is already closed\n";
     }
     file_stream_.close();
   }
