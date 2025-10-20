@@ -29,16 +29,14 @@ public:
   }
   Buffer(Run &run, int initial_load, std::fstream &file_stream) {
     run_ = run;
-    auto tuple = run_.get_next_records(initial_load, file_stream);
-    records_ = std::get<0>(tuple);
-    end_of_run_ = std::get<1>(tuple);
+    std::tie(records_, end_of_run_) =
+        run_.get_next_records(initial_load, file_stream);
   }
 
   void init(std::fstream &file_stream) {
-    auto tuple = run_.get_next_records(config::records_to_load, file_stream);
-    records_ = std::get<0>(tuple);
+    std::tie(records_, end_of_run_) =
+        run_.get_next_records(config::records_to_load, file_stream);
     std::reverse(records_.begin(), records_.end());
-    end_of_run_ = std::get<1>(tuple);
   }
 
   std::tuple<Record, bool> get_record(std::fstream &file_stream) {
@@ -46,20 +44,25 @@ public:
     if (!records_.empty()) {
       Record record = records_.back();
       records_.pop_back();
-      return std::make_tuple(record, false);
+      return {record, false};
     }
 
     if (end_of_run_) {
-      return std::make_tuple(Record(), true);
+      return {Record(), true};
     }
 
-    auto tuple = run_.get_next_records(config::records_to_load, file_stream);
-    records_ = std::get<0>(tuple);
+    std::tie(records_, end_of_run_) =
+        run_.get_next_records(config::records_to_load, file_stream);
     std::reverse(records_.begin(), records_.end());
-    end_of_run_ = std::get<1>(tuple);
 
     Record record = records_.back();
     records_.pop_back();
-    return std::make_tuple(record, false);
+    return {record, false};
+  }
+
+  void print_records() {
+    for (Record record : records_) {
+      record.print();
+    }
   }
 };

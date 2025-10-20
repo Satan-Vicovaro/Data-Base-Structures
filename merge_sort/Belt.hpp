@@ -72,7 +72,7 @@ public:
     file_stream_.close();
   }
   std::fstream &get_opened_stream() {
-    file_stream_.open(file_name_);
+    file_stream_.open(file_name_, std::ios::in | std::ios::out);
     return file_stream_;
   }
   void close_opened_stream() {
@@ -90,7 +90,7 @@ public:
       file_stream_.clear();
     }
 
-    for (auto record : records) {
+    for (Record record : records) {
       std::string_view value = record.getRecord();
       file_stream_.write(value.data(), value.length());
       file_stream_.write("\n", 1);
@@ -221,7 +221,7 @@ public:
 
     file_stream_.close();
 
-    return std::make_tuple(return_records, end_of_file);
+    return {return_records, end_of_file};
   }
 
   void save_next_chunk(std::vector<Record> &records) {

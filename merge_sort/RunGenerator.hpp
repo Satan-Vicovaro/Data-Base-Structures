@@ -53,6 +53,6 @@ public:
       current_stream_pos_ = file_stream.tellg();
     }
 
-    return std::make_tuple(runs, reached_eof_);
+    return {runs, reached_eof_};
   }
 };

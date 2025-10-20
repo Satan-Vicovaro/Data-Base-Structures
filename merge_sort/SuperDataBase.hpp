@@ -1,6 +1,8 @@
 #pragma once
 #include "Belt.hpp"
+#include "Buffer.hpp"
 #include "Config.hpp"
+#include "Record.hpp"
 #include "RunGenerator.hpp"
 #include "UserInput.hpp"
 #include <algorithm>
@@ -8,7 +10,6 @@
 #include <fstream>
 #include <iostream>
 #include <random>
-#include <string>
 #include <tuple>
 #include <vector>
 
@@ -71,13 +72,10 @@ public:
   void sort_data_base() {
     // phase 1, sort chunks in memory
     bool end_of_chunks = false;
+    std::vector<Record> chunk;
     while (!end_of_chunks) {
-      std::tuple<std::vector<Record>, bool> result_val =
-          main_belt_.get_next_chunk();
+      std::tie(chunk, end_of_chunks) = main_belt_.get_next_chunk();
 
-      end_of_chunks = std::get<1>(result_val);
-
-      std::vector<Record> chunk = std::get<0>(result_val);
       std::sort(chunk.begin(), chunk.end());
 
       main_belt_.save_next_chunk(chunk);
@@ -86,12 +84,28 @@ public:
         record.print();
       }
     }
-    // phase 2, start merging parts
 
+    // phase 2, start merging parts
     std::fstream &file_stream = main_belt_.get_opened_stream();
-    auto tuple = run_generator_.get_runs(config::max_buffer_count, file_stream);
-    std::vector<Run> runs = std::get<0>(tuple);
-    bool end_of_file = std::get<1>(tuple);
+
+    bool end_of_file = false;
+    std::vector<Run> runs;
+    while (!end_of_file) {
+      std::tie(runs, end_of_file) =
+          run_generator_.get_runs(config::max_buffer_count, file_stream);
+
+      std::vector<Buffer> buffers;
+      for (Run run : runs) {
+        buffers.emplace_back(Buffer(run, config::records_to_load, file_stream));
+      }
+
+      int i = 0;
+      for (Buffer buffer : buffers) {
+        std::cout << "Buffer: " << i << "\n";
+        buffer.print_records();
+        i++;
+      }
+    }
     main_belt_.close_opened_stream();
   }
 
