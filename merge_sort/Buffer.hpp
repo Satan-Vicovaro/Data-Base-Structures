@@ -40,6 +40,9 @@ public:
   }
 
   std::tuple<Record, bool> get_record(std::fstream &file_stream) {
+    if(end_of_run_) {
+      return {Record(), true};
+    }
 
     if (!records_.empty()) {
       Record record = records_.back();
@@ -47,13 +50,10 @@ public:
       return {record, false};
     }
 
-    if (end_of_run_) {
-      return {Record(), true};
-    }
-
     std::tie(records_, end_of_run_) =
         run_.get_next_records(config::records_to_load, file_stream);
     std::reverse(records_.begin(), records_.end());
+
 
     Record record = records_.back();
     records_.pop_back();

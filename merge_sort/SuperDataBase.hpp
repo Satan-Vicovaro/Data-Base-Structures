@@ -16,6 +16,7 @@
 class SuperDataBase {
 private:
   Belt main_belt_;
+  Belt secondary_belt_;
   std::mt19937 mt_;
   RunGenerator run_generator_;
 
@@ -23,6 +24,8 @@ public:
   SuperDataBase() {
     main_belt_ = Belt("main_belt");
     main_belt_.init();
+    secondary_belt_ = Belt("secondary_belt");
+    secondary_belt_.init();
     std::mt19937 mt_(time(nullptr));
     run_generator_ = RunGenerator();
   }
@@ -80,8 +83,10 @@ public:
 
       main_belt_.save_next_chunk(chunk);
 
-      for (Record record : chunk) {
-        record.print();
+      if (config::debug) {
+        for (Record &record : chunk) {
+          record.print();
+        }
       }
     }
 
@@ -90,22 +95,56 @@ public:
 
     bool end_of_file = false;
     std::vector<Run> runs;
+
+    std::vector<Record> min_heap;
     while (!end_of_file) {
       std::tie(runs, end_of_file) =
           run_generator_.get_runs(config::max_buffer_count, file_stream);
+
+      if (config::debug) {
+        std::cout << "runs looking at\n";
+        for (Run run : runs) {
+          run.current_record_.print();
+        }
+      }
 
       std::vector<Buffer> buffers;
       for (Run run : runs) {
         buffers.emplace_back(Buffer(run, config::records_to_load, file_stream));
       }
 
-      int i = 0;
-      for (Buffer buffer : buffers) {
-        std::cout << "Buffer: " << i << "\n";
-        buffer.print_records();
-        i++;
+      bool all_buffers_empty = false;
+      std::vector<Record> output_buffer;
+      while (!all_buffers_empty) {
+        bool are_empty = true;
+
+        for (int i = 0; i < buffers.capacity(); i++) {
+          Buffer &buf = buffers[i];
+          auto [record, is_empty] = buf.get_record(file_stream);
+          if (!is_empty) {
+            min_heap.emplace_back(record);
+            std::push_heap(min_heap.begin(), min_heap.end());
+            are_empty = false;
+          }
+        }
+        std::pop_heap(min_heap.begin(), min_heap.end());
+        output_buffer.emplace_back(min_heap.back());
+        all_buffers_empty = are_empty;
+      }
+
+      if (config::debug) {
+        for (Record &record : min_heap) {
+          record.print();
+        }
       }
     }
+    if (config::debug) {
+      std::cout << "final sort:\n";
+      for (Record &record : min_heap) {
+        record.print();
+      }
+    }
+
     main_belt_.close_opened_stream();
   }
 
