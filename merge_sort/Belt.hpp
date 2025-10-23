@@ -45,7 +45,13 @@ public:
     file_name_ = "output/" + std::string(string_name) + ".txt";
   }
 
-  void init() {
+  void init(bool user_choice) {
+    if (!user_choice) {
+      file_stream_.open(file_name_, std::ios::out | std::ios::trunc);
+      file_stream_.close();
+      return;
+    }
+
     file_stream_.open(file_name_);
     if (file_stream_.peek() != std::ifstream::traits_type::eof()) {
       std::cout << "Current file is not empty do you want to truncate (t) or "
@@ -231,8 +237,18 @@ public:
       buffer.push_back('\n');
     }
     file_stream_.open(file_name_);
+    if (!file_stream_) {
+      std::cerr << "Error: could not open file\n";
+      return;
+    }
     file_stream_.seekg(prev_chunk_stream_pos_);
+    if (!file_stream_) {
+      std::cerr << "Error: seekg failed\n";
+    }
     file_stream_.write(buffer.c_str(), buffer.length());
+    if (!file_stream_) {
+      std::cerr << "Error: write failed\n";
+    }
     file_stream_.close();
   }
 };
