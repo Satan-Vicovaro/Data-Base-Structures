@@ -19,8 +19,6 @@ struct Run {
   Run(std::streampos initial_record_pos_, std::fstream &file_stream) {
 
     file_stream.seekg(initial_record_pos_, std::ios::beg);
-    current_record_pos_ = file_stream.tellg();
-
     std::string line = std::string();
     if (std::getline(file_stream, line)) {
       current_record_ = Record(line);
@@ -28,6 +26,7 @@ struct Run {
       std::cout << "Could not initialize the run properrly";
       current_record_ = Record();
     }
+    current_record_pos_ = file_stream.tellg();
   }
 
   std::tuple<std::vector<Record>, bool>
@@ -35,8 +34,8 @@ struct Run {
     bool end_of_run = false;
     int records_read = 0;
     std::vector<Record> result;
-    // result.emplace_back(current_record_);
-    // record_num++;
+    result.emplace_back(current_record_);
+    record_num++;
 
     std::string line;
     file_stream.clear();
@@ -55,6 +54,10 @@ struct Run {
       result.emplace_back(Record(line));
       current_record_ = next_record;
       records_read++;
+    }
+
+    if (end_of_run) {
+      return {result, end_of_run};
     }
 
     if (file_stream.eof()) {

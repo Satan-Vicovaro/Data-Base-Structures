@@ -51,6 +51,7 @@ public:
       }
 
       current_stream_pos_ = file_stream.tellg();
+      cur_record = next_record;
     }
 
     return {runs, reached_eof_};

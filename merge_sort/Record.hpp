@@ -18,6 +18,8 @@ public:
     ones_num_ = 0;
   }
 
+  Record(const Record &) = default;
+
   Record(std::string record) {
     record_ = record;
     ones_num_ = count_zeros_in_binary(record);

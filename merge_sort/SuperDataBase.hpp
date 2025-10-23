@@ -11,6 +11,7 @@
 #include <iostream>
 #include <random>
 #include <tuple>
+#include <utility>
 #include <vector>
 
 class SuperDataBase {
@@ -96,8 +97,19 @@ public:
     bool end_of_file = false;
     std::vector<Run> runs;
 
-    std::vector<Record> min_heap;
+    std::vector<std::tuple<Record, int>> min_heap;
+    auto min_comp = [](const std::tuple<Record, int> &a,
+                       const std::tuple<Record, int> &b) {
+      Record r_a = std::get<0>(a);
+      Record r_b = std::get<0>(b);
+      return a > b;
+    };
+
+    bool all_buffers_empty = false;
+    std::vector<Record> output_buffer;
+
     while (!end_of_file) {
+      // generating runs
       std::tie(runs, end_of_file) =
           run_generator_.get_runs(config::max_buffer_count, file_stream);
 
@@ -108,43 +120,57 @@ public:
         }
       }
 
+      // load buffers
       std::vector<Buffer> buffers;
       for (Run run : runs) {
         buffers.emplace_back(Buffer(run, config::records_to_load, file_stream));
       }
 
-      bool all_buffers_empty = false;
-      std::vector<Record> output_buffer;
-      while (!all_buffers_empty) {
-        bool are_empty = true;
-
-        for (int i = 0; i < buffers.capacity(); i++) {
-          Buffer &buf = buffers[i];
-          auto [record, is_empty] = buf.get_record(file_stream);
-          if (!is_empty) {
-            min_heap.emplace_back(record);
-            std::push_heap(min_heap.begin(), min_heap.end());
-            are_empty = false;
-          }
+      // initialize min heap
+      for (int i = 0; i < buffers.size(); i++) {
+        Buffer &buf = buffers[i];
+        auto record = buf.get_record(file_stream);
+        if (!record) {
+          continue;
         }
-        std::pop_heap(min_heap.begin(), min_heap.end());
-        output_buffer.emplace_back(min_heap.back());
-        all_buffers_empty = are_empty;
+        min_heap.emplace_back(std::move(*record), i);
+      }
+      std::make_heap(min_heap.begin(), min_heap.end(), min_comp);
+
+      // min_heap -> output_buffer
+      while (!min_heap.empty()) {
+        std::pop_heap(min_heap.begin(), min_heap.end(), min_comp);
+        auto [record, buff_index] = min_heap.back();
+        min_heap.pop_back();
+        output_buffer.emplace_back(std::move(record));
+
+        // get next element form buffer
+        Buffer &buff = buffers[buff_index];
+        if (buff.is_buffer_finished()) {
+          continue;
+        }
+
+        auto new_record = buff.get_record(file_stream);
+        if (!new_record) {
+          continue;
+        }
+
+        min_heap.emplace_back(std::move(*new_record), buff_index);
+        std::push_heap(min_heap.begin(), min_heap.end(), min_comp);
       }
 
       if (config::debug) {
-        for (Record &record : min_heap) {
+        for (auto [record, buff_index] : min_heap) {
           record.print();
         }
       }
     }
     if (config::debug) {
       std::cout << "final sort:\n";
-      for (Record &record : min_heap) {
+      for (Record record : output_buffer) {
         record.print();
       }
     }
-
     main_belt_.close_opened_stream();
   }
 

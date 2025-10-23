@@ -8,6 +8,7 @@
 #include <cstddef>
 #include <fstream>
 #include <iosfwd>
+#include <optional>
 #include <tuple>
 #include <vector>
 class Buffer {
@@ -31,6 +32,7 @@ public:
     run_ = run;
     std::tie(records_, end_of_run_) =
         run_.get_next_records(initial_load, file_stream);
+    std::reverse(records_.begin(), records_.end());
   }
 
   void init(std::fstream &file_stream) {
@@ -39,25 +41,22 @@ public:
     std::reverse(records_.begin(), records_.end());
   }
 
-  std::tuple<Record, bool> get_record(std::fstream &file_stream) {
-    if(end_of_run_) {
-      return {Record(), true};
-    }
+  bool is_buffer_finished() { return (end_of_run_ && records_.empty()); }
 
+  std::optional<Record> get_record(std::fstream &file_stream) {
     if (!records_.empty()) {
       Record record = records_.back();
       records_.pop_back();
-      return {record, false};
+      return record;
     }
 
     std::tie(records_, end_of_run_) =
         run_.get_next_records(config::records_to_load, file_stream);
     std::reverse(records_.begin(), records_.end());
 
-
     Record record = records_.back();
     records_.pop_back();
-    return {record, false};
+    return record;
   }
 
   void print_records() {
