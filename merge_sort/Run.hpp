@@ -35,7 +35,7 @@ struct Run {
     int records_read = 0;
     std::vector<Record> result;
     result.emplace_back(current_record_);
-    record_num++;
+    records_read++;
 
     std::string line;
     file_stream.clear();
@@ -45,7 +45,7 @@ struct Run {
       return {result, true}; // Early return to avoid undefined behavior
     }
 
-    while (std::getline(file_stream, line) && records_read < record_num) {
+    while (records_read < record_num && std::getline(file_stream, line)) {
       Record next_record = Record(line);
       if (next_record < current_record_) {
         end_of_run = true;
