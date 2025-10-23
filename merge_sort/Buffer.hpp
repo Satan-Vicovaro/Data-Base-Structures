@@ -35,6 +35,8 @@ public:
     std::reverse(records_.begin(), records_.end());
   }
 
+  std::vector<Record> &get_records() { return records_; }
+
   void init(std::fstream &file_stream) {
     std::tie(records_, end_of_run_) =
         run_.get_next_records(config::records_to_load, file_stream);
