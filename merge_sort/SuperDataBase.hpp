@@ -24,9 +24,9 @@ private:
 public:
   SuperDataBase() {
     main_belt_ = Belt("main_belt");
-    main_belt_.init();
+    main_belt_.init(true);
     secondary_belt_ = Belt("secondary_belt");
-    secondary_belt_.init();
+    secondary_belt_.init(false);
     std::mt19937 mt_(time(nullptr));
     run_generator_ = RunGenerator();
   }
@@ -42,7 +42,7 @@ public:
         quit = true;
         break;
       case UserInput::SHOW_DATA_BASE:
-        main_belt_.print_whole_file();
+        main_belt_.print_whole_file_readable();
         break;
       case UserInput::ADD_ROW:
         std::cout << "how many rows?\n";
@@ -92,86 +92,119 @@ public:
     }
 
     // phase 2, start merging parts
-    std::fstream &file_stream = main_belt_.get_opened_stream();
+    bool one_run_left = false;
+    std::fstream *file_stream;
+    while (!one_run_left) {
 
-    bool end_of_file = false;
-    std::vector<Run> runs;
+      int currently_used_belt = 0;
 
-    std::vector<std::tuple<Record, int>> min_heap;
-    auto min_comp = [](const std::tuple<Record, int> &a,
-                       const std::tuple<Record, int> &b) {
-      Record r_a = std::get<0>(a);
-      Record r_b = std::get<0>(b);
-      return a > b;
-    };
+      if (currently_used_belt == 0) {
+        file_stream = &main_belt_.get_opened_stream();
+      } else {
+        file_stream = &secondary_belt_.get_opened_stream();
+      }
 
-    bool all_buffers_empty = false;
-    std::vector<Record> output_buffer;
+      bool end_of_file = false;
+      std::vector<Run> runs;
 
-    while (!end_of_file) {
-      // generating runs
-      std::tie(runs, end_of_file) =
-          run_generator_.get_runs(config::max_buffer_count, file_stream);
+      std::vector<std::tuple<Record, int>> min_heap;
+      auto min_comp = [](const std::tuple<Record, int> &a,
+                         const std::tuple<Record, int> &b) {
+        Record r_a = std::get<0>(a);
+        Record r_b = std::get<0>(b);
+        return a > b;
+      };
 
-      if (config::debug) {
-        std::cout << "runs looking at\n";
+      std::vector<Record> output_buffer;
+
+      while (!end_of_file) {
+        // generating runs
+        std::tie(runs, end_of_file) =
+            run_generator_.get_runs(config::max_buffer_count, *file_stream);
+
+        if (config::debug) {
+          std::cout << "runs looking at\n";
+          for (Run run : runs) {
+            run.current_record_.print();
+          }
+        }
+
+        // load buffers
+        std::vector<Buffer> buffers;
         for (Run run : runs) {
-          run.current_record_.print();
-        }
-      }
-
-      // load buffers
-      std::vector<Buffer> buffers;
-      for (Run run : runs) {
-        buffers.emplace_back(Buffer(run, config::records_to_load, file_stream));
-      }
-
-      // initialize min heap
-      for (int i = 0; i < buffers.size(); i++) {
-        Buffer &buf = buffers[i];
-        auto record = buf.get_record(file_stream);
-        if (!record) {
-          continue;
-        }
-        min_heap.emplace_back(std::move(*record), i);
-      }
-      std::make_heap(min_heap.begin(), min_heap.end(), min_comp);
-
-      // min_heap -> output_buffer
-      while (!min_heap.empty()) {
-        std::pop_heap(min_heap.begin(), min_heap.end(), min_comp);
-        auto [record, buff_index] = min_heap.back();
-        min_heap.pop_back();
-        output_buffer.emplace_back(std::move(record));
-
-        // get next element form buffer
-        Buffer &buff = buffers[buff_index];
-        if (buff.is_buffer_finished()) {
-          continue;
+          buffers.emplace_back(
+              Buffer(run, config::records_to_load, *file_stream));
         }
 
-        auto new_record = buff.get_record(file_stream);
-        if (!new_record) {
-          continue;
+        // initialize min heap
+        for (int i = 0; i < buffers.size(); i++) {
+          Buffer &buf = buffers[i];
+          auto record = buf.get_record(*file_stream);
+          if (!record) {
+            continue;
+          }
+          min_heap.emplace_back(std::move(*record), i);
+        }
+        std::make_heap(min_heap.begin(), min_heap.end(), min_comp);
+
+        // min_heap -> output_buffer
+        int last_buffer_index = 0;
+        while (!min_heap.empty()) {
+          std::pop_heap(min_heap.begin(), min_heap.end(), min_comp);
+          auto [record, buff_index] = min_heap.back();
+          min_heap.pop_back();
+          output_buffer.emplace_back(std::move(record));
+
+          last_buffer_index = buff_index;
+          // get next element form buffer
+          Buffer &buff = buffers[buff_index];
+          if (buff.is_buffer_finished()) {
+            continue;
+          }
+
+          auto new_record = buff.get_record(*file_stream);
+          if (!new_record) {
+            continue;
+          }
+
+          min_heap.emplace_back(std::move(*new_record), buff_index);
+          std::push_heap(min_heap.begin(), min_heap.end(), min_comp);
         }
 
-        min_heap.emplace_back(std::move(*new_record), buff_index);
-        std::push_heap(min_heap.begin(), min_heap.end(), min_comp);
+        // if heap is empty there is nothing left in Buffers, or only one lasts
+        Buffer &last_buffer = buffers[last_buffer_index];
+        if (!last_buffer.is_buffer_finished()) {
+          std::vector<Record> records = last_buffer.get_records();
+          output_buffer.insert(output_buffer.end(), records.begin(),
+                               records.end());
+        }
+
+        if (currently_used_belt == 0) {
+          secondary_belt_.append_to_file(output_buffer);
+        } else {
+          main_belt_.append_to_file(output_buffer);
+        }
+
+        if (config::debug) {
+          std::cout << "Saved chunk: \n";
+          for (Record record : output_buffer) {
+            record.print();
+          }
+        }
+        output_buffer.clear();
       }
 
-      if (config::debug) {
-        for (auto [record, buff_index] : min_heap) {
-          record.print();
-        }
+      if (currently_used_belt == 0) {
+        main_belt_.close_opened_stream();
+        one_run_left = secondary_belt_.is_file_sorted();
+      } else {
+        secondary_belt_.close_opened_stream();
+        one_run_left = main_belt_.is_file_sorted();
       }
+
+      currently_used_belt =
+          (currently_used_belt + 1) % 2; // we are using only 2 belts
     }
-    if (config::debug) {
-      std::cout << "final sort:\n";
-      for (Record record : output_buffer) {
-        record.print();
-      }
-    }
-    main_belt_.close_opened_stream();
   }
 
   UserInput getUserInput() {
