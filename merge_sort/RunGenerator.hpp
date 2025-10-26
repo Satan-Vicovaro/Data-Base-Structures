@@ -48,6 +48,7 @@ public:
       Record next_record = Record(line);
       if (next_record < cur_record) {
         found_next_starting_point = true;
+        continue;
       }
 
       current_stream_pos_ = file_stream.tellg();
