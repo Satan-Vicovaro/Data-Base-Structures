@@ -16,6 +16,7 @@
 #include <string>
 #include <string_view>
 #include <tuple>
+#include <utility>
 #include <vector>
 
 class Belt {
@@ -117,6 +118,19 @@ public:
         continue;
       }
       end_of_file = true;
+    }
+    file_stream_.close();
+  }
+
+  void print_whole_file_readable() {
+    file_stream_.open(file_name_);
+    if (!file_stream_) {
+      std::cerr << "Error: could not open file\n";
+    }
+    std::string line;
+    while (std::getline(file_stream_, line)) {
+      Record record = Record(line);
+      record.print();
     }
     file_stream_.close();
   }
@@ -250,5 +264,51 @@ public:
       std::cerr << "Error: write failed\n";
     }
     file_stream_.close();
+  }
+
+  void append_to_file(std::vector<Record> &records) {
+    std::string buffer = std::string();
+    for (Record record : records) {
+      buffer.append(record.getRecord());
+      buffer.push_back('\n');
+    }
+    file_stream_.open(file_name_, std::ios::app);
+    if (!file_stream_) {
+      std::cerr << "Error: could not open file\n";
+      return;
+    }
+    file_stream_.write(buffer.c_str(), buffer.length());
+    if (!file_stream_) {
+      std::cerr << "Error: write failed\n";
+    }
+    file_stream_.close();
+  }
+
+  bool is_file_sorted() {
+    file_stream_.open(file_name_);
+    if (!file_stream_) {
+      std::cerr << "Error: could not open file\n";
+      return true;
+    }
+    std::string line;
+    if (!std::getline(file_stream_, line)) {
+      std::cerr << "file is empty?\n";
+
+      file_stream_.close();
+      return true;
+    }
+
+    Record cur_record = Record(line);
+    while (std::getline(file_stream_, line)) {
+      Record next_record = Record(line);
+      if (next_record < cur_record) {
+        file_stream_.close();
+        return true;
+      }
+      cur_record = std::move(next_record);
+    }
+
+    file_stream_.close();
+    return false;
   }
 };
