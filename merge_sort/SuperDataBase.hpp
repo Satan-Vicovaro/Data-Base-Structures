@@ -10,6 +10,7 @@
 #include <fstream>
 #include <iostream>
 #include <random>
+#include <string_view>
 #include <tuple>
 #include <utility>
 #include <vector>
@@ -73,8 +74,7 @@ public:
     return 0;
   }
 
-  void sort_data_base() {
-    // phase 1, sort chunks in memory
+  void phase_1_sort() {
     bool end_of_chunks = false;
     std::vector<Record> chunk;
     while (!end_of_chunks) {
@@ -90,15 +90,16 @@ public:
         }
       }
     }
+  }
 
-    // phase 2, start merging parts
+  void phase_2_sort() {
     bool one_run_left = false;
-    std::fstream *file_stream;
+    // std::fstream *file_stream;
     while (!one_run_left) {
 
       int currently_used_belt = 0;
 
-      file_stream = &main_belt_.get_opened_stream();
+      std::fstream &file_stream = main_belt_.get_opened_stream();
 
       bool end_of_file = false;
       std::vector<Run> runs;
@@ -116,26 +117,23 @@ public:
       while (!end_of_file) {
         // generating runs
         std::tie(runs, end_of_file) =
-            run_generator_.get_runs(config::max_buffer_count, *file_stream);
+            run_generator_.get_runs(config::max_buffer_count, file_stream);
 
         if (config::debug) {
-          std::cout << "runs looking at\n";
-          for (Run run : runs) {
-            run.current_record_.print();
-          }
+          print_runs(runs, "Runs looking at:");
         }
 
         // load buffers
         std::vector<Buffer> buffers;
         for (Run run : runs) {
           buffers.emplace_back(
-              Buffer(run, config::records_to_load, *file_stream));
+              Buffer(run, config::records_to_load, file_stream));
         }
 
         // initialize min heap
         for (int i = 0; i < buffers.size(); i++) {
           Buffer &buf = buffers[i];
-          auto record = buf.get_record(*file_stream);
+          auto record = buf.get_record(file_stream);
           if (!record) {
             continue;
           }
@@ -158,7 +156,7 @@ public:
             continue;
           }
 
-          auto new_record = buff.get_record(*file_stream);
+          auto new_record = buff.get_record(file_stream);
           if (!new_record) {
             continue;
           }
@@ -177,10 +175,7 @@ public:
 
         secondary_belt_.append_to_file(output_buffer);
         if (config::debug) {
-          std::cout << "Saved chunk: \n";
-          for (Record record : output_buffer) {
-            record.print();
-          }
+          print_records(output_buffer, "Saved chunk: ");
         }
         output_buffer.clear();
       }
@@ -197,6 +192,11 @@ public:
       }
     }
     std::swap(main_belt_, secondary_belt_);
+  }
+
+  void sort_data_base() {
+    phase_1_sort();
+    phase_2_sort();
   }
 
   UserInput getUserInput() {
@@ -221,5 +221,22 @@ public:
       return UserInput::SORT_DATA;
     }
     return UserInput::NOTHING;
+  }
+
+  static void print_runs(std::vector<Run> &runs,
+                         std::string_view additional_text) {
+
+    std::cout << additional_text << std::endl;
+    for (Run run : runs) {
+      run.current_record_.print();
+    }
+  }
+  static void print_records(std::vector<Record> records,
+                            std::string_view additional_text) {
+
+    std::cout << additional_text << std::endl;
+    for (Record record : records) {
+      record.print();
+    }
   }
 };
