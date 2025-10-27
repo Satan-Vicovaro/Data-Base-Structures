@@ -8,11 +8,15 @@ class RunGenerator {
 private:
   std::streampos current_stream_pos_;
   bool reached_eof_;
+  int total_runs_counter_;
+  int current_runs_counter_;
 
 public:
   RunGenerator() {
     current_stream_pos_ = 0;
     reached_eof_ = false;
+    total_runs_counter_ = 0;
+    current_runs_counter_ = 0;
   }
 
   std::tuple<std::vector<Run>, bool> get_runs(int runs_num,
@@ -20,6 +24,7 @@ public:
     std::vector<Run> runs = {};
     Run first_run = Run(current_stream_pos_, file_stream);
     runs.emplace_back(first_run);
+    current_runs_counter_++;
 
     Record cur_record = first_run.current_record_;
 
@@ -33,6 +38,7 @@ public:
       Record next_record = Record(line);
       if (next_record < cur_record) {
         runs.emplace_back(Run(current_stream_pos_, file_stream));
+        current_runs_counter_++;
       }
       current_stream_pos_ = file_stream.tellg();
       cur_record = next_record;
@@ -55,6 +61,23 @@ public:
       cur_record = next_record;
     }
 
+    if (reached_eof_) {
+      total_runs_counter_ = current_runs_counter_;
+    }
+
     return {runs, reached_eof_};
+  }
+
+  void reset() {
+    current_stream_pos_ = 0;
+    reached_eof_ = false;
+    current_runs_counter_ = 0;
+  }
+
+  bool is_one_run_left() {
+    if (total_runs_counter_ == 1) {
+      return true;
+    }
+    return false;
   }
 };

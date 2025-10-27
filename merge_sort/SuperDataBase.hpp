@@ -98,11 +98,7 @@ public:
 
       int currently_used_belt = 0;
 
-      if (currently_used_belt == 0) {
-        file_stream = &main_belt_.get_opened_stream();
-      } else {
-        file_stream = &secondary_belt_.get_opened_stream();
-      }
+      file_stream = &main_belt_.get_opened_stream();
 
       bool end_of_file = false;
       std::vector<Run> runs;
@@ -179,12 +175,7 @@ public:
                                records.end());
         }
 
-        if (currently_used_belt == 0) {
-          secondary_belt_.append_to_file(output_buffer);
-        } else {
-          main_belt_.append_to_file(output_buffer);
-        }
-
+        secondary_belt_.append_to_file(output_buffer);
         if (config::debug) {
           std::cout << "Saved chunk: \n";
           for (Record record : output_buffer) {
@@ -194,17 +185,18 @@ public:
         output_buffer.clear();
       }
 
-      if (currently_used_belt == 0) {
-        main_belt_.close_opened_stream();
-        one_run_left = secondary_belt_.is_file_sorted();
-      } else {
-        secondary_belt_.close_opened_stream();
-        one_run_left = main_belt_.is_file_sorted();
-      }
+      main_belt_.close_opened_stream();
+      if (config::debug)
+        main_belt_.print_whole_file_readable();
+      one_run_left = run_generator_.is_one_run_left();
+      run_generator_.reset();
 
-      currently_used_belt =
-          (currently_used_belt + 1) % 2; // we are using only 2 belts
+      if (!one_run_left) {
+        main_belt_.truncate_file();
+        std::swap(main_belt_, secondary_belt_);
+      }
     }
+    std::swap(main_belt_, secondary_belt_);
   }
 
   UserInput getUserInput() {

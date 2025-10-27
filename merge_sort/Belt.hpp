@@ -80,6 +80,7 @@ public:
   }
   std::fstream &get_opened_stream() {
     file_stream_.open(file_name_, std::ios::in | std::ios::out);
+    file_stream_.clear();
     return file_stream_;
   }
   void close_opened_stream() {
@@ -128,9 +129,12 @@ public:
       std::cerr << "Error: could not open file\n";
     }
     std::string line;
+    int i = 0;
     while (std::getline(file_stream_, line)) {
       Record record = Record(line);
+      std::cout << i << ": ";
       record.print();
+      i++;
     }
     file_stream_.close();
   }
@@ -310,5 +314,10 @@ public:
 
     file_stream_.close();
     return false;
+  }
+
+  void truncate_file() {
+    file_stream_.open(file_name_, std::ios::trunc | std::ios::out);
+    file_stream_.close();
   }
 };
