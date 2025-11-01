@@ -24,6 +24,10 @@ public:
     record_ = record;
     ones_num_ = count_zeros_in_binary(record);
   }
+  Record(std::string_view record) {
+    record_ = record;
+    ones_num_ = count_zeros_in_binary(record);
+  }
 
   ~Record() {}
 
