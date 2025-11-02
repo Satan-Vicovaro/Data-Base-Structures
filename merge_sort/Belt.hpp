@@ -1,9 +1,11 @@
 #pragma once
 #include "Config.hpp"
+#include "IOManager.hpp"
 #include "Record.hpp"
 #include <cctype>
 #include <cstddef>
 #include <cstdio>
+#include <cstdlib>
 #include <cstring>
 #include <filesystem>
 #include <fstream>
@@ -11,6 +13,7 @@
 #include <iosfwd>
 #include <iostream>
 #include <iterator>
+#include <memory>
 #include <random>
 #include <shared_mutex>
 #include <string>
@@ -28,6 +31,7 @@ private:
   std::fstream file_stream_;
   std::streampos prev_chunk_stream_pos_;
   std::streampos last_stream_pos_;
+  std::shared_ptr<IOManager> io_manager_;
 
 public:
   Belt() {
@@ -36,14 +40,16 @@ public:
     prev_chunk_stream_pos_ = 0;
     belt_name_ = "output/default_name";
     file_name_ = std::string(belt_name_ + ".txt");
+    io_manager_ = nullptr;
   }
 
-  Belt(std::string_view string_name) {
+  Belt(std::shared_ptr<IOManager> io_manager, std::string_view string_name) {
     current_chunk_number_ = 0;
     last_stream_pos_ = 0;
     prev_chunk_stream_pos_ = 0;
     belt_name_ = std::string(string_name);
     file_name_ = "output/" + std::string(string_name) + ".txt";
+    io_manager_ = io_manager;
   }
 
   void init(bool user_choice) {
@@ -98,11 +104,20 @@ public:
       file_stream_.clear();
     }
 
+    int buffer_size = records.size() * (config::record_char_size + 1);
+    char *buffer = new char[buffer_size];
+    int buffer_pointer = 0;
+
     for (Record record : records) {
       std::string_view value = record.getRecord();
-      file_stream_.write(value.data(), value.length());
-      file_stream_.write("\n", 1);
+      std::strncpy(&buffer[buffer_pointer], value.data(),
+                   config::record_char_size);
+      buffer_pointer += config::record_char_size;
+      buffer[buffer_pointer] = '\n';
+      buffer_pointer++;
     }
+    io_manager_->write_memory_page(buffer, buffer_size, file_stream_);
+    free(buffer);
     file_stream_.close();
   }
 
@@ -142,6 +157,9 @@ public:
   void generate_radom_data(std::mt19937 &generator, int record_num) {
     std::vector<Record> records =
         Record::generate_random_records(generator, record_num);
+
+    // io_manager_->write_memory_page(char *buffer, int buffer_size,
+    // std::fstream &f_stream);
 
     write_to_file(records);
   }
@@ -216,24 +234,27 @@ public:
   std::tuple<std::vector<Record>, bool> get_next_chunk() {
     int element_counter = 0;
     std::vector<Record> return_records = {};
-    std::string line = "";
     bool end_of_file = false;
 
     file_stream_.open(file_name_);
-
     file_stream_.seekg(last_stream_pos_);
+    auto result = io_manager_->get_memory_page(file_stream_);
     prev_chunk_stream_pos_ = last_stream_pos_;
-
-    while (element_counter < config::in_memory_chunk_element_count &&
-           !end_of_file) {
-
-      if (!std::getline(file_stream_, line)) {
-        end_of_file = true;
-      } else {
-        return_records.emplace_back(Record(line));
-        element_counter++;
-      }
+    if (!result.has_value()) {
+      end_of_file = true;
+    } else {
+      return_records = result.value();
     }
+    // while (element_counter < config::in_memory_chunk_element_count &&
+    //        !end_of_file) {
+    //
+    //   if (!std::getline(file_stream_, line)) {
+    //     end_of_file = true;
+    //   } else {
+    //     return_records.emplace_back(Record(line));
+    //     element_counter++;
+    //   }
+    // }
 
     if (end_of_file) {
       current_chunk_number_ = 0;

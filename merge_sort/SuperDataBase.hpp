@@ -2,6 +2,7 @@
 #include "Belt.hpp"
 #include "Buffer.hpp"
 #include "Config.hpp"
+#include "IOManager.hpp"
 #include "Record.hpp"
 #include "RunGenerator.hpp"
 #include "UserInput.hpp"
@@ -21,12 +22,15 @@ private:
   Belt secondary_belt_;
   std::mt19937 mt_;
   RunGenerator run_generator_;
+  IOManager io_manager_;
 
 public:
   SuperDataBase() {
-    main_belt_ = Belt("main_belt");
+    io_manager_ = IOManager();
+    main_belt_ = Belt(std::make_shared<IOManager>(io_manager_), "main_belt");
     main_belt_.init(true);
-    secondary_belt_ = Belt("secondary_belt");
+    secondary_belt_ =
+        Belt(std::make_shared<IOManager>(io_manager_), "secondary_belt");
     secondary_belt_.init(false);
     std::mt19937 mt_(time(nullptr));
     run_generator_ = RunGenerator();

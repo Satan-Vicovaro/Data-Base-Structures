@@ -1,6 +1,8 @@
 #pragma once
 
 #include "Belt.hpp"
+#include "IOManager.hpp"
+#include <memory>
 #include <utility>
 class BeltManager {
 private:
@@ -8,9 +10,12 @@ private:
   Belt belt_2_;
 
 public:
-  BeltManager() {
-    belt_1_ = Belt("belt_1");
-    belt_2_ = Belt("belt_2");
+  BeltManager(const std::shared_ptr<IOManager> &io_manager)
+      : belt_1_(io_manager, "belt_1"), belt_2_(io_manager, "belt_2") {}
+
+  BeltManager(std::shared_ptr<IOManager> io_manager) {
+    belt_1_ = Belt(io_manager, "belt_1");
+    belt_2_ = Belt(io_manager, "belt_2");
   }
 
   void swap_belts_() { std::swap(belt_1_, belt_2_); }
