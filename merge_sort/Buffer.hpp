@@ -23,11 +23,6 @@ public:
     records_ = {};
     end_of_run_ = false;
   }
-  Buffer(std::streampos initial_stream_pos, std::fstream &file_stream) {
-    run_ = Run(initial_stream_pos, file_stream);
-    records_ = {};
-    end_of_run_ = false;
-  }
   Buffer(Run &run, int initial_load, std::fstream &file_stream) {
     run_ = run;
     std::tie(records_, end_of_run_) =
