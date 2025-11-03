@@ -240,21 +240,12 @@ public:
     file_stream_.seekg(last_stream_pos_);
     auto result = io_manager_->get_memory_page(file_stream_);
     prev_chunk_stream_pos_ = last_stream_pos_;
+
     if (!result.has_value()) {
       end_of_file = true;
     } else {
       return_records = result.value();
     }
-    // while (element_counter < config::in_memory_chunk_element_count &&
-    //        !end_of_file) {
-    //
-    //   if (!std::getline(file_stream_, line)) {
-    //     end_of_file = true;
-    //   } else {
-    //     return_records.emplace_back(Record(line));
-    //     element_counter++;
-    //   }
-    // }
 
     if (end_of_file) {
       current_chunk_number_ = 0;

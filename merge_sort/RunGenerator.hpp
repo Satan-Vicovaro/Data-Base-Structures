@@ -1,6 +1,8 @@
 #pragma once
+#include "IOManager.hpp"
 #include "Run.hpp"
 #include <iosfwd>
+#include <memory>
 #include <string>
 #include <tuple>
 #include <vector>
@@ -10,6 +12,7 @@ private:
   bool reached_eof_;
   int total_runs_counter_;
   int current_runs_counter_;
+  std::shared_ptr<IOManager> io_manager_;
 
 public:
   RunGenerator() {
@@ -17,12 +20,20 @@ public:
     reached_eof_ = false;
     total_runs_counter_ = 0;
     current_runs_counter_ = 0;
+    io_manager_ = nullptr;
+  }
+  RunGenerator(std::shared_ptr<IOManager> io_manager) {
+    current_stream_pos_ = 0;
+    reached_eof_ = false;
+    total_runs_counter_ = 0;
+    current_runs_counter_ = 0;
+    io_manager_ = io_manager;
   }
 
   std::tuple<std::vector<Run>, bool> get_runs(int runs_num,
                                               std::fstream &file_stream) {
     std::vector<Run> runs = {};
-    Run first_run = Run(current_stream_pos_, file_stream);
+    Run first_run = Run(current_stream_pos_, file_stream, io_manager_);
     runs.emplace_back(first_run);
     current_runs_counter_++;
 
@@ -37,7 +48,7 @@ public:
 
       Record next_record = Record(line);
       if (next_record < cur_record) {
-        runs.emplace_back(Run(current_stream_pos_, file_stream));
+        runs.emplace_back(Run(current_stream_pos_, file_stream, io_manager_));
         current_runs_counter_++;
       }
       current_stream_pos_ = file_stream.tellg();
