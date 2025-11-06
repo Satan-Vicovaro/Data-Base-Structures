@@ -80,20 +80,40 @@ public:
 
   void phase_1_sort() {
     bool end_of_chunks = false;
-    std::vector<Record> chunk;
+
+    std::vector<std::vector<Record>> chunk_vec;
+
     while (!end_of_chunks) {
-      std::tie(chunk, end_of_chunks) = main_belt_.get_next_chunk();
+      for (int i = 0; i < config::max_buffer_count && !end_of_chunks; i++) {
+        std::vector<Record> chunk;
+        std::tie(chunk, end_of_chunks) = main_belt_.get_next_chunk();
+        chunk_vec.emplace_back(chunk);
+      }
 
-      std::sort(chunk.begin(), chunk.end());
+      if (end_of_chunks) {
+        break;
+      }
 
-      main_belt_.save_next_chunk(chunk);
-
-      if (config::debug) {
+      std::vector<Record *> flat_record_list;
+      for (std::vector<Record> &chunk : chunk_vec) {
         for (Record &record : chunk) {
-          record.print();
+          flat_record_list.emplace_back(&record);
         }
       }
+
+      std::sort(flat_record_list.begin(), flat_record_list.end(),
+                Record::compare_function);
+
+      secondary_belt_.save_next_chunk(&flat_record_list);
+
+      // if (config::debug) {
+      //   for (Record &record : chunk) {
+      //     record.print();
+      //   }
+      // }
     }
+    std::swap(main_belt_, secondary_belt_);
+    main_belt_.print_whole_file_readable();
   }
 
   void phase_2_sort() {

@@ -96,6 +96,32 @@ public:
     file_stream_.close();
   }
 
+  void write_to_file(const std::vector<Record *> *records) {
+
+    file_stream_.open(file_name_, std::ios::app);
+    if (!file_stream_.is_open()) {
+      std::cout << "Could not open file: " << file_name_ << std::endl;
+      file_stream_.clear();
+    }
+
+    int buffer_size = records->size() * (config::record_char_size + 1);
+    char *buffer = new char[buffer_size];
+    int buffer_pointer = 0;
+
+    for (Record *record : *records) {
+      std::string_view value = record->getRecord();
+      std::strncpy(&buffer[buffer_pointer], value.data(),
+                   config::record_char_size);
+      buffer_pointer += config::record_char_size;
+      buffer[buffer_pointer] = '\n';
+      buffer_pointer++;
+    }
+
+    io_manager_->write_memory_page(buffer, buffer_size, file_stream_);
+    free(buffer);
+    file_stream_.close();
+  }
+
   void write_to_file(const std::vector<Record> &records) {
 
     file_stream_.open(file_name_, std::ios::app);
@@ -239,6 +265,7 @@ public:
     file_stream_.open(file_name_);
     file_stream_.seekg(last_stream_pos_);
     auto result = io_manager_->get_memory_page(file_stream_);
+    last_stream_pos_ = file_stream_.tellg();
     prev_chunk_stream_pos_ = last_stream_pos_;
 
     if (!result.has_value()) {
@@ -260,26 +287,30 @@ public:
     return {return_records, end_of_file};
   }
 
-  void save_next_chunk(std::vector<Record> &records) {
-    std::string buffer = std::string();
-    for (Record record : records) {
-      buffer.append(record.getRecord());
-      buffer.push_back('\n');
-    }
-    file_stream_.open(file_name_);
-    if (!file_stream_) {
-      std::cerr << "Error: could not open file\n";
-      return;
-    }
-    file_stream_.seekg(prev_chunk_stream_pos_);
-    if (!file_stream_) {
-      std::cerr << "Error: seekg failed\n";
-    }
-    file_stream_.write(buffer.c_str(), buffer.length());
-    if (!file_stream_) {
-      std::cerr << "Error: write failed\n";
-    }
-    file_stream_.close();
+  // void save_next_chunk(std::vector<Record> &records) {
+  //   std::string buffer = std::string();
+  //   for (Record record : records) {
+  //     buffer.append(record.getRecord());
+  //     buffer.push_back('\n');
+  //   }
+  //   file_stream_.open(file_name_);
+  //   if (!file_stream_) {
+  //     std::cerr << "Error: could not open file\n";
+  //     return;
+  //   }
+  //   file_stream_.seekg(prev_chunk_stream_pos_);
+  //   if (!file_stream_) {
+  //     std::cerr << "Error: seekg failed\n";
+  //   }
+  //   file_stream_.write(buffer.c_str(), buffer.length());
+  //   if (!file_stream_) {
+  //     std::cerr << "Error: write failed\n";
+  //   }
+  //   file_stream_.close();
+  // }
+
+  void save_next_chunk(std::vector<Record *> *records) {
+    write_to_file(&(*records));
   }
 
   void append_to_file(std::vector<Record> &records) {

@@ -100,4 +100,8 @@ public:
   bool operator<=(const Record &other) const {
     return (ones_num_ <= other.ones_num_);
   }
+
+  static bool compare_function(Record *a, Record *b) {
+    return a->ones_num_ < b->ones_num_;
+  }
 };

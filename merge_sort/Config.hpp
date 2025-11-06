@@ -9,7 +9,7 @@ const int records_to_load = 3;
 const int max_buffer_count = 2;
 const int debug = false;
 
-const int records_per_page = 1000;
+const int records_per_page = 10;
 
 const int page_size =
     (record_char_size + 1) * records_per_page; // + 1 for \n or \0 character
