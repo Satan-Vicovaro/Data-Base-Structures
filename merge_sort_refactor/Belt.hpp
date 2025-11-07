@@ -81,6 +81,32 @@ public:
     file_stream_.close();
   }
 
+  void append_flat_list_to_file(std::vector<Record *> &records) {
+
+    file_stream_.open(file_name_, std::ios::app);
+    if (!file_stream_.is_open()) {
+      std::cout << "Could not open file: " << file_name_ << std::endl;
+      file_stream_.clear();
+    }
+
+    int record_num = records.size();
+    int per_page = Config::vals().records_per_page;
+
+    for (int i = 0; i < record_num; i += per_page) {
+      int end = std::min(i + per_page, record_num);
+      std::vector<Record *> record_slice(records.begin() + i,
+                                         records.begin() + end);
+
+      std::unique_ptr<char[]> buffer;
+      int buffer_size;
+      std::tie(buffer, buffer_size) = Record::into_char_buffer(record_slice);
+
+      io_manager_.write_memory_page(buffer.get(), buffer_size, file_stream_);
+    }
+
+    file_stream_.close();
+  }
+
   void replace_from_beginning(std::vector<Record> &records) {
     file_stream_.open(file_name_, std::ios::out);
 
@@ -217,6 +243,26 @@ public:
   void generate_radom_data(std::mt19937 &generator, int record_num) {
     std::vector<Record> records =
         Record::generate_random_records(generator, record_num);
+    append_to_file(records);
+  }
+
+  void add_records_from_user(int record_num) {
+    std::vector<Record> records = std::vector(record_num, Record());
+    std::string input_string =
+        std::string(Config::vals().record_char_size, ' ');
+    for (int i = 0; i < record_num; i++) {
+      std::cin >> input_string;
+
+      if (input_string.size() < Config::vals().record_char_size) {
+        std::cout << "adding characters 'C' to end of string\n";
+      } else if (input_string.size() > Config::vals().record_char_size) {
+        std::cout << "truncating to " << Config::vals().record_char_size
+                  << " characters\n";
+      }
+
+      input_string.resize(Config::vals().record_char_size, 'C');
+      records[i] = std::move(Record(input_string));
+    }
     append_to_file(records);
   }
 

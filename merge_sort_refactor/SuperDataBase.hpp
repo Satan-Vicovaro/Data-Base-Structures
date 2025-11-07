@@ -1,15 +1,19 @@
 #include "Belt.hpp"
+#include "BufferManager.hpp"
+#include "Config.hpp"
 #include "UserInput.hpp"
 #include <ctime>
 #include <iostream>
 #include <random>
 #include <string>
+#include <utility>
 
 class SuperDataBase {
 
   std::mt19937 mt_;
   Belt main_belt_;
   Belt secondary_belt_;
+  BufferManager buffer_manager_;
 
 public:
   SuperDataBase() {
@@ -19,7 +23,10 @@ public:
 
     secondary_belt_ = Belt("secondary");
     secondary_belt_.init(false);
+
+    buffer_manager_ = BufferManager(Config::vals().max_buffer_count);
   }
+
   int start() {
     std::cout << "type 'h' for help\n";
     bool quit = false;
@@ -51,7 +58,7 @@ public:
         main_belt_.load_data_from_file();
         break;
       case UserInput::SORT_DATA:
-        std::cout << "TODO: sort_data\n";
+        sort_data();
         break;
       case UserInput::READ_RECORD:
         int index = 0;
@@ -69,13 +76,19 @@ public:
     int record_num = 0;
     std::cout << "how many rows?\n";
     std::cin >> record_num;
-    std::cout << "TODO: add_rows_user\n";
+    main_belt_.add_records_from_user(record_num);
   }
   void generate_random_data() {
     int record_num = 0;
     std::cout << "How many records?\n";
     std::cin >> record_num;
     main_belt_.generate_radom_data(mt_, record_num);
+  }
+
+  void sort_data() {
+    // phase one
+    buffer_manager_.load_and_write_n_records(main_belt_, secondary_belt_);
+    std::swap(main_belt_, secondary_belt_);
   }
 
   UserInput getUserInput() {

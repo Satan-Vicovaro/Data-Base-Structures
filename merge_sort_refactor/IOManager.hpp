@@ -120,7 +120,7 @@ public:
         std::cerr << "Error coppying into padded buffer\n";
       }
 
-      std::cout << padded_buffer;
+      // std::cout << padded_buffer;
       f_stream.write(padded_buffer, Config::vals().page_size);
 
       free(padded_buffer);

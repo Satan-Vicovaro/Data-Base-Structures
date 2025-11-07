@@ -87,6 +87,22 @@ public:
     return {std::move(char_arr), buffer_size};
   }
 
+  static std::tuple<std::unique_ptr<char[]>, int>
+  into_char_buffer(std::vector<Record *> &records) {
+    int buffer_size = records.size() * Config::vals().record_char_size;
+    std::unique_ptr<char[]> char_arr(new char[buffer_size]);
+    std::memset(char_arr.get(), 0, buffer_size);
+
+    int offset = 0;
+    for (Record *record : records) {
+      std::strncpy(&char_arr.get()[offset], record->get_record_c_str(),
+                   Config::vals().record_char_size);
+      offset += Config::vals().record_char_size;
+    }
+
+    return {std::move(char_arr), buffer_size};
+  }
+
   void into_file_string(char &buffer, int &buffsize) {
     if (record_.size() > buffsize) {
       std::cout << "record size if bigger than buffsize, skipping string\n";
