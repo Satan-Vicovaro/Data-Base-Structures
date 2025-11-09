@@ -167,6 +167,7 @@ public:
 
     auto stop = std::chrono::high_resolution_clock::now();
     duration_ = stop - start;
+    buffer_manager_.clear_buffers();
   }
 
   UserInput getUserInput() {
