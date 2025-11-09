@@ -31,6 +31,7 @@ public:
 
   void init(bool user_choice);
   std::vector<Run> get_file_runs(int run_num);
+  void find_optional_chunk_merges();
   void save_run();
   void append_flat_list_to_file(std::vector<Record *> &records);
   void append_to_file(std::vector<Record> &records);
@@ -48,4 +49,5 @@ public:
   void reset_cyclic_read();
   int read_operation_count();
   int write_operation_count();
+  void reset();
 };

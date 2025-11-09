@@ -1,5 +1,11 @@
 #include "Belt.hpp"
+#include "Config.hpp"
 #include "Run.hpp"
+#include <algorithm>
+#include <iosfwd>
+#include <iostream>
+#include <utility>
+#include <vector>
 
 Belt::Belt() {
   last_stream_pos_ = 0;
@@ -52,7 +58,49 @@ void Belt::init(bool user_choice) {
   file_stream_.close();
 }
 
+void Belt::find_optional_chunk_merges() {
+  std::vector<Run> new_runs;
+
+  int i = 0;
+  while (true) {
+    if (i + 1 > runs_in_file_.size()) {
+      break;
+    }
+    Run good_run = std::move(runs_in_file_[i]);
+    good_run.init(*this);
+    new_runs.emplace_back(std::move(good_run));
+    while (true) {
+      i++;
+      if (i + 1 > runs_in_file_.size()) {
+        break;
+      }
+
+      Run potentially_mergable = std::move(runs_in_file_[i]);
+      potentially_mergable.init(*this);
+
+      std::streampos last_part_prev_run_pos =
+          potentially_mergable.current_record_pos -
+          (std::streampos)Config::vals().page_size;
+      Run last_part_prev_run = Run(last_part_prev_run_pos);
+
+      last_part_prev_run.init(*this);
+      if (last_part_prev_run.current_record_last >
+          potentially_mergable.current_record_first) {
+        break;
+      }
+      std::cout << "Neighbour's runs got merged\n";
+    }
+  }
+
+  runs_in_file_ = std::move(new_runs);
+  // we have to remove curr records bsc it will break other functions
+  for (Run &run : runs_in_file_) {
+    run.current_record_last = Record();
+  }
+}
+
 std::vector<Run> Belt::get_file_runs(int run_num) {
+  find_optional_chunk_merges();
   int return_run_size = std::min(run_num, (int)runs_in_file_.size());
 
   // yes, im super lazy here
@@ -154,9 +202,9 @@ std::tuple<std::vector<Record>, bool> Belt::run_read(Run &run) {
     file_stream_.clear();
   }
 
-  file_stream_.seekg(run.current_record_pos_);
+  file_stream_.seekg(run.current_record_pos);
   IOManagerResult result = io_manager_.get_memory_page(file_stream_);
-  run.current_record_pos_ = file_stream_.tellg();
+  run.current_record_pos = file_stream_.tellg();
   file_stream_.close();
 
   std::vector<Record> records = std::move(result.records);
@@ -311,3 +359,9 @@ void Belt::truncate_file() {
 void Belt::reset_cyclic_read() { last_stream_pos_ = 0; }
 int Belt::read_operation_count() { return io_manager_.reads_counter_; }
 int Belt::write_operation_count() { return io_manager_.writes_counter_; }
+
+void Belt::reset() {
+  runs_in_file_.clear();
+  last_stream_pos_ = 0;
+  last_run_start_pos_ = 0;
+}
