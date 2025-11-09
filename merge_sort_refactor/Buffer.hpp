@@ -72,4 +72,5 @@ public:
     }
     std::cout << "Trying to write empty buffer to file\n";
   }
+  void clear() { records_.clear(); }
 };

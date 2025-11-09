@@ -13,7 +13,7 @@ class BufferManager {
 
   // second phase
   std::vector<Buffer> buffers_;
-  Buffer out_buffer;
+  Buffer out_buffer_;
 
   int input_buff_count_;
 
@@ -22,7 +22,7 @@ public:
     max_buff_count_ = 0;
     input_buff_count_ = 0;
     buffers_ = std::vector<Buffer>();
-    out_buffer = Buffer();
+    out_buffer_ = Buffer();
     records_vec_ = std::vector<std::vector<Record>>();
   }
 
@@ -30,17 +30,17 @@ public:
     max_buff_count_ = buff_num;
     input_buff_count_ = buff_num - 1;
     buffers_ = std::vector<Buffer>();
-    out_buffer = Buffer();
+    out_buffer_ = Buffer();
     records_vec_ = std::vector<std::vector<Record>>();
   }
 
   std::vector<Buffer> &get_buffers_ref() { return buffers_; }
 
-  void append_to_out_buffer(Record &record, Belt &belt) {
-    out_buffer.append_out_buffer(std::move(record), belt);
+  void append_to_out_buffer_(Record &record, Belt &belt) {
+    out_buffer_.append_out_buffer(std::move(record), belt);
   }
-  void write_remanings_of_out_buffer(Belt &belt) {
-    out_buffer.write_buffer(belt);
+  void write_remanings_of_out_buffer_(Belt &belt) {
+    out_buffer_.write_buffer(belt);
   }
 
   void load_and_write_n_records(Belt &main_belt, Belt &secondary_belt) {
@@ -95,4 +95,8 @@ public:
   }
 
   int get_buffers_count() { return buffers_.size(); }
+  void clear_buffers() {
+    buffers_.clear();
+    out_buffer_.clear();
+  }
 };
