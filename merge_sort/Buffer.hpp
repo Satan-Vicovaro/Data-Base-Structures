@@ -1,64 +1,31 @@
 #pragma once
-
+#include "Belt.hpp"
 #include "Config.hpp"
 #include "Record.hpp"
 #include "Run.hpp"
 #include <algorithm>
-#include <atomic>
-#include <cstddef>
-#include <fstream>
-#include <iosfwd>
+#include <iostream>
 #include <optional>
 #include <tuple>
+#include <utility>
 #include <vector>
+
 class Buffer {
 private:
   Run run_;
   std::vector<Record> records_;
-  bool end_of_run_;
 
 public:
-  Buffer() {
-    run_ = Run();
-    records_ = {};
-    end_of_run_ = false;
-  }
-  Buffer(Run &run, int initial_load, std::fstream &file_stream) {
-    run_ = run;
-    std::tie(records_, end_of_run_) =
-        run_.get_next_records(initial_load, file_stream);
-    std::reverse(records_.begin(), records_.end());
-  }
+  Buffer();
+  Buffer(Run starting_run);
+  void init(Belt &belt);
+  std::optional<Record> get_record(Belt &belt);
+  bool load_next_records(Belt &belt);
 
-  std::vector<Record> &get_records() { return records_; }
+  // writes to file if full
+  void append_out_buffer(Record &&record, Belt &belt);
 
-  void init(std::fstream &file_stream) {
-    std::tie(records_, end_of_run_) =
-        run_.get_next_records(config::records_to_load, file_stream);
-    std::reverse(records_.begin(), records_.end());
-  }
-
-  bool is_buffer_finished() { return (end_of_run_ && records_.empty()); }
-
-  std::optional<Record> get_record(std::fstream &file_stream) {
-    if (!records_.empty()) {
-      Record record = records_.back();
-      records_.pop_back();
-      return record;
-    }
-
-    std::tie(records_, end_of_run_) =
-        run_.get_next_records(config::records_to_load, file_stream);
-    std::reverse(records_.begin(), records_.end());
-
-    Record record = records_.back();
-    records_.pop_back();
-    return record;
-  }
-
-  void print_records() {
-    for (Record record : records_) {
-      record.print();
-    }
-  }
+  // empties the buffer
+  void write_buffer(Belt &belt);
+  void clear();
 };

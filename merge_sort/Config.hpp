@@ -1,16 +1,29 @@
 #pragma once
 
-namespace config {
-const int print_file_stream_size = 100;
-const int record_char_size = 10;
+struct Config {
+private:
+  Config() {
+    debug = false;
+    record_char_size = 10;
+    max_buffer_count = 50;
+    records_per_page = 400;
+    page_size = record_char_size * records_per_page;
+  }
 
-const int in_memory_chunk_element_count = 5;
-const int records_to_load = 3;
-const int max_buffer_count = 2;
-const int debug = false;
+public:
+  Config(const Config &) = delete;
+  Config &operator=(const Config &) = delete;
+  Config(Config &&) = delete;
+  Config &operator=(Config &&) = delete;
 
-const int records_per_page = 10;
+  int debug;
+  int record_char_size;
+  int max_buffer_count;
+  int records_per_page;
+  int page_size;
 
-const int page_size =
-    (record_char_size + 1) * records_per_page; // + 1 for \n or \0 character
-} // namespace config
+  static Config &vals() {
+    static Config instance;
+    return instance;
+  }
+};
