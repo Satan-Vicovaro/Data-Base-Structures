@@ -23,8 +23,7 @@ struct IOManagerResult {
   IOManagerInfo info;
 };
 
-class IOManager {
-private:
+struct IOManager {
   int disc_operation_counter_;
   int reads_counter_;
   int writes_counter_;
