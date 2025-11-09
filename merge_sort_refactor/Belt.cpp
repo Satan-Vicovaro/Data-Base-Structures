@@ -309,3 +309,5 @@ void Belt::truncate_file() {
   file_stream_.close();
 }
 void Belt::reset_cyclic_read() { last_stream_pos_ = 0; }
+int Belt::read_operation_count() { return io_manager_.reads_counter_; }
+int Belt::write_operation_count() { return io_manager_.writes_counter_; }

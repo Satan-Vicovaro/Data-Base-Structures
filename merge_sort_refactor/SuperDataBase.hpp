@@ -5,8 +5,10 @@
 #include "MinHeap.hpp"
 #include "UserInput.hpp"
 #include <algorithm>
+#include <chrono>
 #include <ctime>
 #include <iostream>
+#include <ostream>
 #include <random>
 #include <string>
 #include <tuple>
@@ -18,6 +20,7 @@ class SuperDataBase {
   Belt main_belt_;
   Belt secondary_belt_;
   BufferManager buffer_manager_;
+  std::chrono::duration<double> duration_;
 
 public:
   SuperDataBase() {
@@ -63,6 +66,7 @@ public:
         break;
       case UserInput::SORT_DATA:
         sort_data();
+        print_sort_statistics();
         break;
       case UserInput::READ_RECORD:
         int index = 0;
@@ -76,6 +80,19 @@ public:
   }
 
   void print_data_base() { main_belt_.print_whole_file_readable(); }
+  void print_sort_statistics() {
+    std::cout << "Disc read operations:\n";
+    std::cout << main_belt_.read_operation_count() +
+                     secondary_belt_.read_operation_count()
+              << std::endl;
+    std::cout << "Disc write operations:\n";
+    std::cout << main_belt_.write_operation_count() +
+                     secondary_belt_.write_operation_count()
+              << std::endl;
+
+    std::cout << "Time enlapsed: \n";
+    std::cout << duration_.count() << std::endl;
+  }
   void add_rows_user() {
     int record_num = 0;
     std::cout << "how many rows?\n";
@@ -91,6 +108,8 @@ public:
   }
 
   void sort_data() {
+    auto start = std::chrono::high_resolution_clock::now();
+
     // phase one
     buffer_manager_.load_and_write_n_records(main_belt_, secondary_belt_);
 
@@ -145,6 +164,9 @@ public:
         secondary_belt_.truncate_file();
       }
     }
+
+    auto stop = std::chrono::high_resolution_clock::now();
+    duration_ = stop - start;
   }
 
   UserInput getUserInput() {

@@ -46,4 +46,6 @@ public:
   void add_records_from_user(int record_num);
   void truncate_file();
   void reset_cyclic_read();
+  int read_operation_count();
+  int write_operation_count();
 };
