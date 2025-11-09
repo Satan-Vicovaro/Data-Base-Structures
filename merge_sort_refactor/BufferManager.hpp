@@ -36,10 +36,10 @@ public:
 
   std::vector<Buffer> &get_buffers_ref() { return buffers_; }
 
-  void append_to_out_buffer_(Record &record, Belt &belt) {
+  void append_to_out_buffer(Record &record, Belt &belt) {
     out_buffer_.append_out_buffer(std::move(record), belt);
   }
-  void write_remanings_of_out_buffer_(Belt &belt) {
+  void write_remanings_of_out_buffer(Belt &belt) {
     out_buffer_.write_buffer(belt);
   }
 
