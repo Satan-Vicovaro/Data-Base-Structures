@@ -5,8 +5,8 @@ private:
   Config() {
     debug = false;
     record_char_size = 10;
-    max_buffer_count = 3;
-    records_per_page = 10;
+    max_buffer_count = 50;
+    records_per_page = 400;
     page_size = record_char_size * records_per_page;
   }
 

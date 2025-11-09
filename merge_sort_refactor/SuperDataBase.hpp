@@ -1,15 +1,19 @@
+#pragma once
 #include "Belt.hpp"
 #include "BufferManager.hpp"
 #include "Config.hpp"
+#include "MinHeap.hpp"
 #include "UserInput.hpp"
+#include <algorithm>
 #include <ctime>
 #include <iostream>
 #include <random>
 #include <string>
+#include <tuple>
 #include <utility>
+#include <vector>
 
 class SuperDataBase {
-
   std::mt19937 mt_;
   Belt main_belt_;
   Belt secondary_belt_;
@@ -78,6 +82,7 @@ public:
     std::cin >> record_num;
     main_belt_.add_records_from_user(record_num);
   }
+
   void generate_random_data() {
     int record_num = 0;
     std::cout << "How many records?\n";
@@ -88,7 +93,58 @@ public:
   void sort_data() {
     // phase one
     buffer_manager_.load_and_write_n_records(main_belt_, secondary_belt_);
+
+    if (Config::vals().debug) {
+      std::cout << "Phase one:\n";
+      secondary_belt_.print_whole_file_readable();
+    }
+
     std::swap(main_belt_, secondary_belt_);
+    secondary_belt_.truncate_file();
+
+    // phase two
+    bool one_run_left = false;
+    while (!one_run_left) {
+
+      bool end_of_file = false;
+      bool first_loop = true;
+      while (!buffer_manager_.initialize_buffers(main_belt_)) {
+        if (first_loop) {
+          first_loop = false;
+          if (buffer_manager_.get_buffers_count() == 1) {
+            one_run_left = true;
+            break;
+          }
+        }
+
+        MinHeap min_heap = MinHeap();
+        secondary_belt_.save_run();
+
+        min_heap.init(buffer_manager_, main_belt_);
+
+        std::vector<Buffer> &buffers = buffer_manager_.get_buffers_ref();
+
+        while (!min_heap.empty()) {
+          auto [record, buffer_index] = min_heap.pop();
+          buffer_manager_.append_to_out_buffer(record, secondary_belt_);
+          auto new_record = buffers[buffer_index].get_record(main_belt_);
+          if (!new_record) {
+            continue;
+          }
+          min_heap.append(std::make_tuple(*new_record, buffer_index));
+        }
+
+        buffer_manager_.write_remanings_of_out_buffer(secondary_belt_);
+
+        if (Config::vals().debug) {
+          secondary_belt_.print_whole_file_readable();
+        }
+      }
+      if (!one_run_left) {
+        std::swap(main_belt_, secondary_belt_);
+        secondary_belt_.truncate_file();
+      }
+    }
   }
 
   UserInput getUserInput() {

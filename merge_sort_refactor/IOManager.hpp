@@ -50,6 +50,8 @@ public:
       return_val.info = IOManagerInfo::FILE_NOT_OPENED;
       return return_val;
     }
+    f_stream.clear();
+
     char *buffer = new char[Config::vals().page_size];
 
     f_stream.read(buffer, Config::vals().page_size);
@@ -103,6 +105,8 @@ public:
     if (!f_stream.is_open()) {
       std::cerr << "File is not opened \n";
     }
+
+    f_stream.clear();
 
     if (buffer_size % Config::vals().page_size != 0) {
       std::cout << "Data does not match the page, adding padding\n";
