@@ -108,7 +108,7 @@ public:
     f_stream.clear();
 
     if (buffer_size % Config::vals().page_size != 0) {
-      std::cout << "Data does not match the page, adding padding\n";
+      // std::cout << "Data does not match the page, adding padding\n";
       int whole_pages_count = buffer_size / Config::vals().page_size;
       int whole_page_buffer_size = whole_pages_count * Config::vals().page_size;
       if (whole_pages_count != 0) {

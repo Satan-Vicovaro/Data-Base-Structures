@@ -70,7 +70,7 @@ public:
       records_.clear();
       return;
     }
-    std::cout << "Trying to write empty buffer to file\n";
+    // std::cout << "Trying to write empty buffer to file\n";
   }
   void clear() { records_.clear(); }
 };
