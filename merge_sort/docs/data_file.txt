@@ -1,5 +1,4 @@
 Record num: 25000000
-Record num: 25000000
 ---Start---
 ROP: 71575
 WOP: 71434
