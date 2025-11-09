@@ -14,32 +14,16 @@ private:
   int ones_num_;
 
 public:
-  Record() {
-    record_ = std::string();
-    ones_num_ = 0;
-  }
-
+  Record();
   Record(const Record &) = default;
 
-  Record(std::string record) {
-    record_ = record;
-    ones_num_ = count_zeros_in_binary(record);
-  }
-  Record(std::string_view record) {
-    record_ = record;
-    ones_num_ = count_zeros_in_binary(record);
-  }
+  Record(std::string record);
+  Record(std::string_view record);
+  void print();
+  std::string_view get_record_view();
+  const char *get_record_c_str();
+  int get_record_size();
 
-  ~Record() {}
-
-  void print() {
-    std::cout << "record: " << record_ << ", ones_num_: " << ones_num_
-              << std::endl;
-  }
-
-  std::string_view get_record_view() { return record_; }
-  const char *get_record_c_str() { return record_.c_str(); }
-  int get_record_size() { return record_.size(); }
   static int count_zeros_in_binary(std::string_view string) {
     int ones_num = 0;
     for (int i = 0; i < string.length(); i++) {
@@ -103,39 +87,13 @@ public:
     return {std::move(char_arr), buffer_size};
   }
 
-  void into_file_string(char &buffer, int &buffsize) {
-    if (record_.size() > buffsize) {
-      std::cout << "record size if bigger than buffsize, skipping string\n";
-      return;
-    }
-    record_.copy(&buffer, record_.size());
-    buffsize = record_.size();
-  }
-
-  bool operator==(const Record &other) const {
-    return (ones_num_ == other.ones_num_);
-  }
-
-  bool operator!=(const Record &other) const {
-    return (ones_num_ != other.ones_num_);
-  }
-
-  bool operator>(const Record &other) const {
-    return (ones_num_ > other.ones_num_);
-  }
-
-  bool operator<(const Record &other) const {
-    return (ones_num_ < other.ones_num_);
-  }
-
-  bool operator>=(const Record &other) const {
-    return (ones_num_ >= other.ones_num_);
-  }
-
-  bool operator<=(const Record &other) const {
-    return (ones_num_ <= other.ones_num_);
-  }
-
+  void into_file_string(char &buffer, int &buffsize);
+  bool operator==(const Record &other) const;
+  bool operator!=(const Record &other) const;
+  bool operator>(const Record &other) const;
+  bool operator<(const Record &other) const;
+  bool operator>=(const Record &other) const;
+  bool operator<=(const Record &other) const;
   static bool compare_function(Record *a, Record *b) {
     return a->ones_num_ < b->ones_num_;
   }

@@ -88,7 +88,8 @@ void Belt::find_optional_chunk_merges() {
           potentially_mergable.current_record_first) {
         break;
       }
-      std::cout << "Neighbour's runs got merged\n";
+      if (Config::vals().debug)
+        std::cout << "Neighbour's runs got merged\n";
     }
   }
 
@@ -364,4 +365,6 @@ void Belt::reset() {
   runs_in_file_.clear();
   last_stream_pos_ = 0;
   last_run_start_pos_ = 0;
+  io_manager_.reads_counter_ = 0;
+  io_manager_.writes_counter_ = 0;
 }
