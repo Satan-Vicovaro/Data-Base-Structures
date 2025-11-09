@@ -51,7 +51,7 @@ public:
         add_rows_user();
         break;
       case UserInput::NOTHING:
-        std::cout << "not a valid command\n";
+        // std::cout << "not a valid command\n";
         break;
       case UserInput::DISPLAY_INFO:
         std::cout << "a - add row\nq - quit\nh - help\ns - show data base\n"
@@ -168,13 +168,14 @@ public:
     auto stop = std::chrono::high_resolution_clock::now();
     duration_ = stop - start;
     buffer_manager_.clear_buffers();
+    main_belt_.reset();
+    secondary_belt_.reset();
+    secondary_belt_.truncate_file();
   }
 
   UserInput getUserInput() {
-    std::string input_string;
     std::cout << "Waiting for input\n";
-    std::cin >> input_string;
-    char input_char = input_string[0];
+    char input_char = std::cin.get();
     input_char = std::tolower(input_char);
     switch (input_char) {
     case ('a'):
