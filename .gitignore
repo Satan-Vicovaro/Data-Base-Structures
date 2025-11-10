@@ -9,11 +9,5 @@ merge_sort/output/*
 !merge_sort/output/.gitkeep
 
 
-merge_sort_refactor/.vscode/*
-merge_sort_refactor/build/*
-
-merge_sort_refactor/bin/*
-!merge_sort_refactor/bin/.gitkeep
-
-merge_sort_refactor/output/*
-!merge_sort_refactor/output/.gitkeep
+merge_sort/.idea
+merge_sort/venv
