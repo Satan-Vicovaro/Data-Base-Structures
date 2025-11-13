@@ -1,5 +1,5 @@
 CXX = g++
-CXXFLASGS += -std=c++17 -Wall -O1 -D_FORTIFY_SOURCE=2
+CXXFLASGS += -std=c++17 -Wall -O2 -D_FORTIFY_SOURCE=2
 
 SRC_DIR = .
 BUILD_DIR = build
