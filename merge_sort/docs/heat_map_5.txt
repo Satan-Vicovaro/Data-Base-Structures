@@ -1,5 +1,4 @@
 Record num: 100000
-Record num: 100000
 ---Start---
 ROP: 49138
 WOP: 26674
