@@ -24,6 +24,7 @@ void Run::init(Belt &belt) {
     current_record_first = std::move(records.front());
     current_record_last = std::move(records.back());
   }
+  end_of_run = end_of_file;
   current_record_pos = stream_pos;
 }
 

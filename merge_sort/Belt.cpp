@@ -74,14 +74,23 @@ void Belt::find_optional_chunk_merges() {
       if (i + 1 > runs_in_file_.size()) {
         break;
       }
-
+      if (i==50)
+        printf("lol");
       Run potentially_mergable = std::move(runs_in_file_[i]);
-      potentially_mergable.init(*this);
+          potentially_mergable.init(*this);
+
+      if(potentially_mergable.end_of_run) {
+        if (Config::vals().debug)
+          std::cout << "Neighbour's runs got merged\n";
+        continue;
+      }
 
       std::streampos last_part_prev_run_pos =
           potentially_mergable.current_record_pos -
           (std::streampos)Config::vals().page_size;
       Run last_part_prev_run = Run(last_part_prev_run_pos);
+
+  
 
       last_part_prev_run.init(*this);
       if (last_part_prev_run.current_record_last >
