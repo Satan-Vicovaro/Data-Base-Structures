@@ -21,6 +21,7 @@ class SuperDataBase {
   Belt secondary_belt_;
   BufferManager buffer_manager_;
   std::chrono::duration<double> duration_;
+  int phase_num_;
 
 public:
   SuperDataBase();

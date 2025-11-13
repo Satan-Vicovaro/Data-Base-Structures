@@ -1,14 +1,16 @@
 #include "SuperDataBase.hpp"
+#include <iostream>
 
 SuperDataBase::SuperDataBase() {
   mt_ = std::mt19937(time(nullptr));
   main_belt_ = Belt("main");
-  main_belt_.init(true);
+  main_belt_.init(false);
 
   secondary_belt_ = Belt("secondary");
   secondary_belt_.init(false);
 
   buffer_manager_ = BufferManager(Config::vals().max_buffer_count);
+  phase_num_ = 0;
 }
 
 int SuperDataBase::start() {
@@ -41,6 +43,8 @@ int SuperDataBase::start() {
       main_belt_.load_data_from_file();
       break;
     case UserInput::SORT_DATA:
+
+      reset_sort_vars();
       sort_data();
       // print_sort_statistics();
       print_compact_sort_statistics();
@@ -72,6 +76,9 @@ void SuperDataBase::print_sort_statistics() {
 
   std::cout << "Time enlapsed: \n";
   std::cout << duration_.count() << std::endl;
+
+  std::cout << "Phase count: \n";
+  std::cout << phase_num_;
 }
 void SuperDataBase::print_compact_sort_statistics() {
   int rop = main_belt_.read_operation_count() +
@@ -80,9 +87,10 @@ void SuperDataBase::print_compact_sort_statistics() {
             secondary_belt_.write_operation_count();
   double time_enlapsed = duration_.count();
   printf("---Start---\n");
-  printf("ROP: %d\nWOP: %d\nT: %f\nRCS: %d\nMBC: %d\nRPP: %d\n", rop, wop,
-         time_enlapsed, Config::vals().record_char_size,
-         Config::vals().max_buffer_count, Config::vals().records_per_page);
+  printf("ROP: %d\nWOP: %d\nT: %f\nRCS: %d\nMBC: %d\nRPP: %d\n PHS: %d\n", rop,
+         wop, time_enlapsed, Config::vals().record_char_size,
+         Config::vals().max_buffer_count, Config::vals().records_per_page,
+         phase_num_);
   printf("---Stop---\n");
 }
 void SuperDataBase::add_rows_user() {
@@ -100,6 +108,7 @@ void SuperDataBase::generate_random_data() {
 }
 
 void SuperDataBase::sort_data() {
+  int phase_count = 0;
   auto start = std::chrono::high_resolution_clock::now();
 
   // phase one
@@ -112,17 +121,19 @@ void SuperDataBase::sort_data() {
 
   std::swap(main_belt_, secondary_belt_);
   secondary_belt_.truncate_file();
+  phase_count++;
 
   // phase two
   bool one_run_left = false;
   while (!one_run_left) {
-
+    phase_count++;
     bool first_loop = true;
     while (!buffer_manager_.initialize_buffers(main_belt_)) {
       if (first_loop) {
         first_loop = false;
         if (buffer_manager_.get_buffers_count() == 1) {
           one_run_left = true;
+          phase_count--;
           break;
         }
       }
@@ -150,6 +161,7 @@ void SuperDataBase::sort_data() {
         secondary_belt_.print_whole_file_readable();
       }
     }
+
     if (!one_run_left) {
       std::swap(main_belt_, secondary_belt_);
       secondary_belt_.truncate_file();
@@ -158,6 +170,7 @@ void SuperDataBase::sort_data() {
 
   auto stop = std::chrono::high_resolution_clock::now();
   duration_ = stop - start;
+  phase_num_ = phase_count;
 }
 
 void SuperDataBase::reset_sort_vars() {
@@ -170,8 +183,9 @@ void SuperDataBase::reset_sort_vars() {
 
 UserInput SuperDataBase::getUserInput() {
   std::cout << "Waiting for input\n";
-  std::cin >> std::ws;
-  char input_char = std::cin.get();
+  std::string input = "";
+  std::cin >> input;
+  char input_char = input[0];
   input_char = std::tolower(input_char);
   switch (input_char) {
   case ('a'):
