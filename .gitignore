@@ -11,3 +11,5 @@ merge_sort/output/*
 
 merge_sort/.idea
 merge_sort/venv
+
+merge_sort/docs/Formated data

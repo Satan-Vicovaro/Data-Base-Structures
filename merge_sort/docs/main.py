@@ -57,7 +57,7 @@ class Data:
 def load_data() -> list[Data]:
     data = []
 
-    files = ["final_data_XD.txt"]
+    files = ["final_data_XD_next.txt"]
 
     for file in files:
         with open(file, "r") as f:
@@ -113,7 +113,7 @@ def load_data() -> list[Data]:
                             float(time),
                             int(max_buffers),
                             int(records_per_page),
-                            int(phase_cout),
+                            int(phase_cout) - 1,
                         )
                     )
                     record_num = read_operations = write_operations = time = (
@@ -123,11 +123,11 @@ def load_data() -> list[Data]:
 
 
 def cool_data_viz(data_list):
-    data_list = [
-        data
-        for data in data_list
-        if data.read_operations != 3 and data.time_enlapsed < 1000.0
-    ]
+    # data_list = [
+    #     data
+    #     for data in data_list
+    #     if data.read_operations != 3 and data.time_enlapsed < 1000.0
+    # ]
 
     for records, coresponding_data in groupby(
         sorted(data_list, key=lambda x: (x.record_num, x.time_enlapsed)),
@@ -137,14 +137,14 @@ def cool_data_viz(data_list):
         data = list(coresponding_data)
 
         data = [
-            (dat.max_buffers, dat.records_per_page, dat.time_enlapsed) for dat in data
+            (dat.max_buffers, dat.records_per_page, dat.phase_count) for dat in data
         ]
 
         y, x, z = zip(*data)
         # z = [val for val in z]
 
-        x_bins = np.linspace(min(x), max(x), 137)
-        y_bins = np.linspace(min(y), max(y), 137)
+        x_bins = np.linspace(min(x), max(x), 100)
+        y_bins = np.linspace(min(y), max(y), 100)
         # x_bins = sorted(x)
         # y_bins = sorted(y)
 
@@ -164,12 +164,17 @@ def cool_data_viz(data_list):
 
         fig, ax = plt.subplots(figsize=(8, 6))
         c = ax.pcolormesh(xedges, yedges, heatmap.T, shading="auto", cmap="viridis")
-        fig.colorbar(c, ax=ax)
+        colors = fig.colorbar(c, ax=ax)
+        colors.set_label("Time")
         ax.set_xlabel("Records per page")
         ax.set_ylabel("Max buffer count")
         ax.set_title("2D Heatmap")
         plt.show()
         plt.show(block=True)
+
+
+def log_n(k, n):
+    return np.log(k) / np.log(n)
 
 
 def proper_viz(data_list: list[Data]):
@@ -183,8 +188,9 @@ def proper_viz(data_list: list[Data]):
     print(np.max(expected_operation_x))
     print(min(data_list, key=lambda x: x.record_num).record_num)
     print(max(data_list, key=lambda x: x.record_num).record_num)
+
     expected_operation_y = (
-        expected_operation_x / 200 * np.log10(expected_operation_x / 200)
+       2* (expected_operation_x / 200) * (log_n(expected_operation_x/200, 200))
     )
     # expected_operation_y = np.ones(len(data_list))
 
@@ -254,7 +260,7 @@ def main():
     data_list = load_data()
     # cool_data_viz(data_list)
     proper_viz(data_list)
-    # into_file(data_list)
+    into_file(data_list)
 
 
 if __name__ == "__main__":

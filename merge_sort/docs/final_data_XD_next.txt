@@ -1,0 +1,2020 @@
+Record num: 100000
+---Start---
+ROP: 1013
+WOP: 1000
+T: 0.023902
+RCS: 10
+MBC: 200
+RPP: 200
+ PHS: 3
+---Stop---
+Record num: 600000
+---Start---
+ROP: 6066
+WOP: 6000
+T: 0.154865
+RCS: 10
+MBC: 200
+RPP: 200
+ PHS: 3
+---Stop---
+Record num: 1100000
+---Start---
+ROP: 11113
+WOP: 11000
+T: 0.273071
+RCS: 10
+MBC: 200
+RPP: 200
+ PHS: 3
+---Stop---
+Record num: 1600000
+---Start---
+ROP: 16166
+WOP: 16000
+T: 0.436553
+RCS: 10
+MBC: 200
+RPP: 200
+ PHS: 3
+---Stop---
+Record num: 2100000
+---Start---
+ROP: 21213
+WOP: 21000
+T: 0.604782
+RCS: 10
+MBC: 200
+RPP: 200
+ PHS: 3
+---Stop---
+Record num: 2600000
+---Start---
+ROP: 26266
+WOP: 26000
+T: 0.819247
+RCS: 10
+MBC: 200
+RPP: 200
+ PHS: 3
+---Stop---
+Record num: 3100000
+---Start---
+ROP: 31313
+WOP: 31000
+T: 0.938589
+RCS: 10
+MBC: 200
+RPP: 200
+ PHS: 3
+---Stop---
+Record num: 3600000
+---Start---
+ROP: 36366
+WOP: 36000
+T: 1.106885
+RCS: 10
+MBC: 200
+RPP: 200
+ PHS: 3
+---Stop---
+Record num: 4100000
+---Start---
+ROP: 41413
+WOP: 41000
+T: 1.300830
+RCS: 10
+MBC: 200
+RPP: 200
+ PHS: 3
+---Stop---
+Record num: 4600000
+---Start---
+ROP: 46466
+WOP: 46000
+T: 1.468214
+RCS: 10
+MBC: 200
+RPP: 200
+ PHS: 3
+---Stop---
+Record num: 5100000
+---Start---
+ROP: 51513
+WOP: 51000
+T: 1.657651
+RCS: 10
+MBC: 200
+RPP: 200
+ PHS: 3
+---Stop---
+Record num: 5600000
+---Start---
+ROP: 56566
+WOP: 56000
+T: 1.807275
+RCS: 10
+MBC: 200
+RPP: 200
+ PHS: 3
+---Stop---
+Record num: 6100000
+---Start---
+ROP: 61613
+WOP: 61000
+T: 2.080890
+RCS: 10
+MBC: 200
+RPP: 200
+ PHS: 3
+---Stop---
+Record num: 6600000
+---Start---
+ROP: 66666
+WOP: 66000
+T: 2.257379
+RCS: 10
+MBC: 200
+RPP: 200
+ PHS: 3
+---Stop---
+Record num: 7100000
+---Start---
+ROP: 71713
+WOP: 71000
+T: 2.342018
+RCS: 10
+MBC: 200
+RPP: 200
+ PHS: 3
+---Stop---
+Record num: 7600000
+---Start---
+ROP: 76766
+WOP: 76000
+T: 2.509887
+RCS: 10
+MBC: 200
+RPP: 200
+ PHS: 3
+---Stop---
+Record num: 8100000
+---Start---
+ROP: 122329
+WOP: 121500
+T: 3.623680
+RCS: 10
+MBC: 200
+RPP: 200
+ PHS: 4
+---Stop---
+Record num: 8600000
+---Start---
+ROP: 129921
+WOP: 129000
+T: 3.817699
+RCS: 10
+MBC: 200
+RPP: 200
+ PHS: 4
+---Stop---
+Record num: 9100000
+---Start---
+ROP: 137504
+WOP: 136500
+T: 3.976826
+RCS: 10
+MBC: 200
+RPP: 200
+ PHS: 4
+---Stop---
+Record num: 9600000
+---Start---
+ROP: 145096
+WOP: 144000
+T: 4.244260
+RCS: 10
+MBC: 200
+RPP: 200
+ PHS: 4
+---Stop---
+Record num: 10100000
+---Start---
+ROP: 152679
+WOP: 151500
+T: 4.507618
+RCS: 10
+MBC: 200
+RPP: 200
+ PHS: 4
+---Stop---
+Record num: 10600000
+---Start---
+ROP: 160271
+WOP: 159000
+T: 4.869745
+RCS: 10
+MBC: 200
+RPP: 200
+ PHS: 4
+---Stop---
+Record num: 11100000
+---Start---
+ROP: 167854
+WOP: 166500
+T: 4.983702
+RCS: 10
+MBC: 200
+RPP: 200
+ PHS: 4
+---Stop---
+Record num: 11600000
+---Start---
+ROP: 175446
+WOP: 174000
+T: 5.189643
+RCS: 10
+MBC: 200
+RPP: 200
+ PHS: 4
+---Stop---
+Record num: 12100000
+---Start---
+ROP: 183029
+WOP: 181500
+T: 5.343847
+RCS: 10
+MBC: 200
+RPP: 200
+ PHS: 4
+---Stop---
+Record num: 12600000
+---Start---
+ROP: 190621
+WOP: 189000
+T: 5.559618
+RCS: 10
+MBC: 200
+RPP: 200
+ PHS: 4
+---Stop---
+Record num: 13100000
+---Start---
+ROP: 198204
+WOP: 196500
+T: 5.970524
+RCS: 10
+MBC: 200
+RPP: 200
+ PHS: 4
+---Stop---
+Record num: 13600000
+---Start---
+ROP: 205796
+WOP: 204000
+T: 6.278788
+RCS: 10
+MBC: 200
+RPP: 200
+ PHS: 4
+---Stop---
+Record num: 14100000
+---Start---
+ROP: 213379
+WOP: 211500
+T: 6.341710
+RCS: 10
+MBC: 200
+RPP: 200
+ PHS: 4
+---Stop---
+Record num: 14600000
+---Start---
+ROP: 220971
+WOP: 219000
+T: 6.538461
+RCS: 10
+MBC: 200
+RPP: 200
+ PHS: 4
+---Stop---
+Record num: 15100000
+---Start---
+ROP: 228554
+WOP: 226500
+T: 6.818814
+RCS: 10
+MBC: 200
+RPP: 200
+ PHS: 4
+---Stop---
+Record num: 15600000
+---Start---
+ROP: 236146
+WOP: 234000
+T: 7.162855
+RCS: 10
+MBC: 200
+RPP: 200
+ PHS: 4
+---Stop---
+Record num: 16100000
+---Start---
+ROP: 243746
+WOP: 241500
+T: 7.543104
+RCS: 10
+MBC: 200
+RPP: 200
+ PHS: 4
+---Stop---
+Record num: 16600000
+---Start---
+ROP: 251377
+WOP: 249000
+T: 7.743177
+RCS: 10
+MBC: 200
+RPP: 200
+ PHS: 4
+---Stop---
+Record num: 17100000
+---Start---
+ROP: 258996
+WOP: 256500
+T: 7.881864
+RCS: 10
+MBC: 200
+RPP: 200
+ PHS: 4
+---Stop---
+Record num: 17600000
+---Start---
+ROP: 266627
+WOP: 264000
+T: 8.249666
+RCS: 10
+MBC: 200
+RPP: 200
+ PHS: 4
+---Stop---
+Record num: 18100000
+---Start---
+ROP: 274246
+WOP: 271500
+T: 8.333668
+RCS: 10
+MBC: 200
+RPP: 200
+ PHS: 4
+---Stop---
+Record num: 18600000
+---Start---
+ROP: 281877
+WOP: 279000
+T: 8.668035
+RCS: 10
+MBC: 200
+RPP: 200
+ PHS: 4
+---Stop---
+Record num: 19100000
+---Start---
+ROP: 289496
+WOP: 286500
+T: 8.805561
+RCS: 10
+MBC: 200
+RPP: 200
+ PHS: 4
+---Stop---
+Record num: 19600000
+---Start---
+ROP: 297127
+WOP: 294000
+T: 9.011808
+RCS: 10
+MBC: 200
+RPP: 200
+ PHS: 4
+---Stop---
+Record num: 20100000
+---Start---
+ROP: 304746
+WOP: 301500
+T: 9.239039
+RCS: 10
+MBC: 200
+RPP: 200
+ PHS: 4
+---Stop---
+Record num: 20600000
+---Start---
+ROP: 312377
+WOP: 309000
+T: 9.453281
+RCS: 10
+MBC: 200
+RPP: 200
+ PHS: 4
+---Stop---
+Record num: 21100000
+---Start---
+ROP: 319996
+WOP: 316500
+T: 9.720240
+RCS: 10
+MBC: 200
+RPP: 200
+ PHS: 4
+---Stop---
+Record num: 21600000
+---Start---
+ROP: 327627
+WOP: 324000
+T: 10.059734
+RCS: 10
+MBC: 200
+RPP: 200
+ PHS: 4
+---Stop---
+Record num: 22100000
+---Start---
+ROP: 335246
+WOP: 331500
+T: 10.289171
+RCS: 10
+MBC: 200
+RPP: 200
+ PHS: 4
+---Stop---
+Record num: 22600000
+---Start---
+ROP: 342877
+WOP: 339000
+T: 10.665568
+RCS: 10
+MBC: 200
+RPP: 200
+ PHS: 4
+---Stop---
+Record num: 23100000
+---Start---
+ROP: 350496
+WOP: 346500
+T: 10.681529
+RCS: 10
+MBC: 200
+RPP: 200
+ PHS: 4
+---Stop---
+Record num: 23600000
+---Start---
+ROP: 358127
+WOP: 354000
+T: 10.983654
+RCS: 10
+MBC: 200
+RPP: 200
+ PHS: 4
+---Stop---
+Record num: 24100000
+---Start---
+ROP: 365766
+WOP: 361500
+T: 11.620384
+RCS: 10
+MBC: 200
+RPP: 200
+ PHS: 4
+---Stop---
+Record num: 24600000
+---Start---
+ROP: 373436
+WOP: 369000
+T: 11.881824
+RCS: 10
+MBC: 200
+RPP: 200
+ PHS: 4
+---Stop---
+Record num: 25100000
+---Start---
+ROP: 381091
+WOP: 376500
+T: 12.042312
+RCS: 10
+MBC: 200
+RPP: 200
+ PHS: 4
+---Stop---
+Record num: 25600000
+---Start---
+ROP: 388761
+WOP: 384000
+T: 12.342389
+RCS: 10
+MBC: 200
+RPP: 200
+ PHS: 4
+---Stop---
+Record num: 26100000
+---Start---
+ROP: 396416
+WOP: 391500
+T: 12.323800
+RCS: 10
+MBC: 200
+RPP: 200
+ PHS: 4
+---Stop---
+Record num: 26600000
+---Start---
+ROP: 404086
+WOP: 399000
+T: 12.709947
+RCS: 10
+MBC: 200
+RPP: 200
+ PHS: 4
+---Stop---
+Record num: 27100000
+---Start---
+ROP: 411741
+WOP: 406500
+T: 12.948431
+RCS: 10
+MBC: 200
+RPP: 200
+ PHS: 4
+---Stop---
+Record num: 27600000
+---Start---
+ROP: 419411
+WOP: 414000
+T: 13.251007
+RCS: 10
+MBC: 200
+RPP: 200
+ PHS: 4
+---Stop---
+Record num: 28100000
+---Start---
+ROP: 427066
+WOP: 421500
+T: 13.606280
+RCS: 10
+MBC: 200
+RPP: 200
+ PHS: 4
+---Stop---
+Record num: 28600000
+---Start---
+ROP: 434736
+WOP: 429000
+T: 13.746650
+RCS: 10
+MBC: 200
+RPP: 200
+ PHS: 4
+---Stop---
+Record num: 29100000
+---Start---
+ROP: 442391
+WOP: 436500
+T: 14.159065
+RCS: 10
+MBC: 200
+RPP: 200
+ PHS: 4
+---Stop---
+Record num: 29600000
+---Start---
+ROP: 450061
+WOP: 444000
+T: 14.255269
+RCS: 10
+MBC: 200
+RPP: 200
+ PHS: 4
+---Stop---
+Record num: 30100000
+---Start---
+ROP: 457716
+WOP: 451500
+T: 14.530043
+RCS: 10
+MBC: 200
+RPP: 200
+ PHS: 4
+---Stop---
+Record num: 30600000
+---Start---
+ROP: 465386
+WOP: 459000
+T: 14.610239
+RCS: 10
+MBC: 200
+RPP: 200
+ PHS: 4
+---Stop---
+Record num: 31100000
+---Start---
+ROP: 473041
+WOP: 466500
+T: 14.934866
+RCS: 10
+MBC: 200
+RPP: 200
+ PHS: 4
+---Stop---
+Record num: 31600000
+---Start---
+ROP: 480711
+WOP: 474000
+T: 15.204611
+RCS: 10
+MBC: 200
+RPP: 200
+ PHS: 4
+---Stop---
+Record num: 32100000
+---Start---
+ROP: 488389
+WOP: 481500
+T: 15.874749
+RCS: 10
+MBC: 200
+RPP: 200
+ PHS: 4
+---Stop---
+Record num: 32600000
+---Start---
+ROP: 496098
+WOP: 489000
+T: 16.182938
+RCS: 10
+MBC: 200
+RPP: 200
+ PHS: 4
+---Stop---
+Record num: 33100000
+---Start---
+ROP: 503789
+WOP: 496500
+T: 16.293058
+RCS: 10
+MBC: 200
+RPP: 200
+ PHS: 4
+---Stop---
+Record num: 33600000
+---Start---
+ROP: 511498
+WOP: 504000
+T: 16.574793
+RCS: 10
+MBC: 200
+RPP: 200
+ PHS: 4
+---Stop---
+Record num: 34100000
+---Start---
+ROP: 519189
+WOP: 511500
+T: 16.769584
+RCS: 10
+MBC: 200
+RPP: 200
+ PHS: 4
+---Stop---
+Record num: 34600000
+---Start---
+ROP: 526898
+WOP: 519000
+T: 17.406439
+RCS: 10
+MBC: 200
+RPP: 200
+ PHS: 4
+---Stop---
+Record num: 35100000
+---Start---
+ROP: 534589
+WOP: 526500
+T: 17.253318
+RCS: 10
+MBC: 200
+RPP: 200
+ PHS: 4
+---Stop---
+Record num: 35600000
+---Start---
+ROP: 542298
+WOP: 534000
+T: 17.550125
+RCS: 10
+MBC: 200
+RPP: 200
+ PHS: 4
+---Stop---
+Record num: 36100000
+---Start---
+ROP: 549989
+WOP: 541500
+T: 17.908633
+RCS: 10
+MBC: 200
+RPP: 200
+ PHS: 4
+---Stop---
+Record num: 36600000
+---Start---
+ROP: 557698
+WOP: 549000
+T: 18.425628
+RCS: 10
+MBC: 200
+RPP: 200
+ PHS: 4
+---Stop---
+Record num: 37100000
+---Start---
+ROP: 565389
+WOP: 556500
+T: 18.416761
+RCS: 10
+MBC: 200
+RPP: 200
+ PHS: 4
+---Stop---
+Record num: 37600000
+---Start---
+ROP: 573098
+WOP: 564000
+T: 18.565782
+RCS: 10
+MBC: 200
+RPP: 200
+ PHS: 4
+---Stop---
+Record num: 38100000
+---Start---
+ROP: 580789
+WOP: 571500
+T: 19.291071
+RCS: 10
+MBC: 200
+RPP: 200
+ PHS: 4
+---Stop---
+Record num: 38600000
+---Start---
+ROP: 588498
+WOP: 579000
+T: 19.339699
+RCS: 10
+MBC: 200
+RPP: 200
+ PHS: 4
+---Stop---
+Record num: 39100000
+---Start---
+ROP: 596189
+WOP: 586500
+T: 19.168023
+RCS: 10
+MBC: 200
+RPP: 200
+ PHS: 4
+---Stop---
+Record num: 39600000
+---Start---
+ROP: 603898
+WOP: 594000
+T: 19.522244
+RCS: 10
+MBC: 200
+RPP: 200
+ PHS: 4
+---Stop---
+Record num: 40100000
+---Start---
+ROP: 611615
+WOP: 601500
+T: 19.444094
+RCS: 10
+MBC: 200
+RPP: 200
+ PHS: 4
+---Stop---
+Record num: 40600000
+---Start---
+ROP: 619363
+WOP: 609000
+T: 19.522772
+RCS: 10
+MBC: 200
+RPP: 200
+ PHS: 4
+---Stop---
+Record num: 41100000
+---Start---
+ROP: 627090
+WOP: 616500
+T: 20.033806
+RCS: 10
+MBC: 200
+RPP: 200
+ PHS: 4
+---Stop---
+Record num: 41600000
+---Start---
+ROP: 634838
+WOP: 624000
+T: 19.998036
+RCS: 10
+MBC: 200
+RPP: 200
+ PHS: 4
+---Stop---
+Record num: 42100000
+---Start---
+ROP: 642565
+WOP: 631500
+T: 20.194440
+RCS: 10
+MBC: 200
+RPP: 200
+ PHS: 4
+---Stop---
+Record num: 42600000
+---Start---
+ROP: 650313
+WOP: 639000
+T: 20.935547
+RCS: 10
+MBC: 200
+RPP: 200
+ PHS: 4
+---Stop---
+Record num: 43100000
+---Start---
+ROP: 658040
+WOP: 646500
+T: 20.776391
+RCS: 10
+MBC: 200
+RPP: 200
+ PHS: 4
+---Stop---
+Record num: 43600000
+---Start---
+ROP: 665788
+WOP: 654000
+T: 21.114337
+RCS: 10
+MBC: 200
+RPP: 200
+ PHS: 4
+---Stop---
+Record num: 44100000
+---Start---
+ROP: 673515
+WOP: 661500
+T: 21.362644
+RCS: 10
+MBC: 200
+RPP: 200
+ PHS: 4
+---Stop---
+Record num: 44600000
+---Start---
+ROP: 681263
+WOP: 669000
+T: 21.291260
+RCS: 10
+MBC: 200
+RPP: 200
+ PHS: 4
+---Stop---
+Record num: 45100000
+---Start---
+ROP: 688990
+WOP: 676500
+T: 22.021490
+RCS: 10
+MBC: 200
+RPP: 200
+ PHS: 4
+---Stop---
+Record num: 45600000
+---Start---
+ROP: 696738
+WOP: 684000
+T: 22.173361
+RCS: 10
+MBC: 200
+RPP: 200
+ PHS: 4
+---Stop---
+Record num: 46100000
+---Start---
+ROP: 704465
+WOP: 691500
+T: 22.211352
+RCS: 10
+MBC: 200
+RPP: 200
+ PHS: 4
+---Stop---
+Record num: 46600000
+---Start---
+ROP: 712213
+WOP: 699000
+T: 22.648046
+RCS: 10
+MBC: 200
+RPP: 200
+ PHS: 4
+---Stop---
+Record num: 47100000
+---Start---
+ROP: 719940
+WOP: 706500
+T: 22.684081
+RCS: 10
+MBC: 200
+RPP: 200
+ PHS: 4
+---Stop---
+Record num: 47600000
+---Start---
+ROP: 727688
+WOP: 714000
+T: 22.798674
+RCS: 10
+MBC: 200
+RPP: 200
+ PHS: 4
+---Stop---
+Record num: 48100000
+---Start---
+ROP: 735444
+WOP: 721500
+T: 24.279982
+RCS: 10
+MBC: 200
+RPP: 200
+ PHS: 4
+---Stop---
+Record num: 48600000
+---Start---
+ROP: 743231
+WOP: 729000
+T: 24.226851
+RCS: 10
+MBC: 200
+RPP: 200
+ PHS: 4
+---Stop---
+Record num: 49100000
+---Start---
+ROP: 750994
+WOP: 736500
+T: 24.576102
+RCS: 10
+MBC: 200
+RPP: 200
+ PHS: 4
+---Stop---
+Record num: 49600000
+---Start---
+ROP: 758781
+WOP: 744000
+T: 24.377016
+RCS: 10
+MBC: 200
+RPP: 200
+ PHS: 4
+---Stop---
+Record num: 50100000
+---Start---
+ROP: 766544
+WOP: 751500
+T: 24.682204
+RCS: 10
+MBC: 200
+RPP: 200
+ PHS: 4
+---Stop---
+Record num: 50600000
+---Start---
+ROP: 774331
+WOP: 759000
+T: 25.104795
+RCS: 10
+MBC: 200
+RPP: 200
+ PHS: 4
+---Stop---
+Record num: 51100000
+---Start---
+ROP: 782094
+WOP: 766500
+T: 25.514832
+RCS: 10
+MBC: 200
+RPP: 200
+ PHS: 4
+---Stop---
+Record num: 51600000
+---Start---
+ROP: 789881
+WOP: 774000
+T: 25.211427
+RCS: 10
+MBC: 200
+RPP: 200
+ PHS: 4
+---Stop---
+Record num: 52100000
+---Start---
+ROP: 797644
+WOP: 781500
+T: 25.639671
+RCS: 10
+MBC: 200
+RPP: 200
+ PHS: 4
+---Stop---
+Record num: 52600000
+---Start---
+ROP: 805431
+WOP: 789000
+T: 26.249470
+RCS: 10
+MBC: 200
+RPP: 200
+ PHS: 4
+---Stop---
+Record num: 53100000
+---Start---
+ROP: 813194
+WOP: 796500
+T: 26.373940
+RCS: 10
+MBC: 200
+RPP: 200
+ PHS: 4
+---Stop---
+Record num: 53600000
+---Start---
+ROP: 820981
+WOP: 804000
+T: 26.544882
+RCS: 10
+MBC: 200
+RPP: 200
+ PHS: 4
+---Stop---
+Record num: 54100000
+---Start---
+ROP: 828744
+WOP: 811500
+T: 27.241281
+RCS: 10
+MBC: 200
+RPP: 200
+ PHS: 4
+---Stop---
+Record num: 54600000
+---Start---
+ROP: 836531
+WOP: 819000
+T: 27.696266
+RCS: 10
+MBC: 200
+RPP: 200
+ PHS: 4
+---Stop---
+Record num: 55100000
+---Start---
+ROP: 844294
+WOP: 826500
+T: 27.139675
+RCS: 10
+MBC: 200
+RPP: 200
+ PHS: 4
+---Stop---
+Record num: 55600000
+---Start---
+ROP: 852081
+WOP: 834000
+T: 27.476728
+RCS: 10
+MBC: 200
+RPP: 200
+ PHS: 4
+---Stop---
+Record num: 56100000
+---Start---
+ROP: 859876
+WOP: 841500
+T: 28.217380
+RCS: 10
+MBC: 200
+RPP: 200
+ PHS: 4
+---Stop---
+Record num: 56600000
+---Start---
+ROP: 867702
+WOP: 849000
+T: 28.557568
+RCS: 10
+MBC: 200
+RPP: 200
+ PHS: 4
+---Stop---
+Record num: 57100000
+---Start---
+ROP: 875501
+WOP: 856500
+T: 29.050870
+RCS: 10
+MBC: 200
+RPP: 200
+ PHS: 4
+---Stop---
+Record num: 57600000
+---Start---
+ROP: 883327
+WOP: 864000
+T: 29.103460
+RCS: 10
+MBC: 200
+RPP: 200
+ PHS: 4
+---Stop---
+Record num: 58100000
+---Start---
+ROP: 891126
+WOP: 871500
+T: 29.305025
+RCS: 10
+MBC: 200
+RPP: 200
+ PHS: 4
+---Stop---
+Record num: 58600000
+---Start---
+ROP: 898952
+WOP: 879000
+T: 29.874983
+RCS: 10
+MBC: 200
+RPP: 200
+ PHS: 4
+---Stop---
+Record num: 59100000
+---Start---
+ROP: 906751
+WOP: 886500
+T: 29.713269
+RCS: 10
+MBC: 200
+RPP: 200
+ PHS: 4
+---Stop---
+Record num: 59600000
+---Start---
+ROP: 914577
+WOP: 894000
+T: 30.180473
+RCS: 10
+MBC: 200
+RPP: 200
+ PHS: 4
+---Stop---
+Record num: 60100000
+---Start---
+ROP: 922376
+WOP: 901500
+T: 30.484599
+RCS: 10
+MBC: 200
+RPP: 200
+ PHS: 4
+---Stop---
+Record num: 60600000
+---Start---
+ROP: 930202
+WOP: 909000
+T: 30.576421
+RCS: 10
+MBC: 200
+RPP: 200
+ PHS: 4
+---Stop---
+Record num: 61100000
+---Start---
+ROP: 938001
+WOP: 916500
+T: 31.025845
+RCS: 10
+MBC: 200
+RPP: 200
+ PHS: 4
+---Stop---
+Record num: 61600000
+---Start---
+ROP: 945827
+WOP: 924000
+T: 31.091267
+RCS: 10
+MBC: 200
+RPP: 200
+ PHS: 4
+---Stop---
+Record num: 62100000
+---Start---
+ROP: 953626
+WOP: 931500
+T: 31.091234
+RCS: 10
+MBC: 200
+RPP: 200
+ PHS: 4
+---Stop---
+Record num: 62600000
+---Start---
+ROP: 961452
+WOP: 939000
+T: 31.308230
+RCS: 10
+MBC: 200
+RPP: 200
+ PHS: 4
+---Stop---
+Record num: 63100000
+---Start---
+ROP: 969251
+WOP: 946500
+T: 31.820642
+RCS: 10
+MBC: 200
+RPP: 200
+ PHS: 4
+---Stop---
+Record num: 63600000
+---Start---
+ROP: 977077
+WOP: 954000
+T: 32.584551
+RCS: 10
+MBC: 200
+RPP: 200
+ PHS: 4
+---Stop---
+Record num: 64100000
+---Start---
+ROP: 984911
+WOP: 961500
+T: 33.164089
+RCS: 10
+MBC: 200
+RPP: 200
+ PHS: 4
+---Stop---
+Record num: 64600000
+---Start---
+ROP: 992776
+WOP: 969000
+T: 33.251146
+RCS: 10
+MBC: 200
+RPP: 200
+ PHS: 4
+---Stop---
+Record num: 65100000
+---Start---
+ROP: 1000611
+WOP: 976500
+T: 33.687836
+RCS: 10
+MBC: 200
+RPP: 200
+ PHS: 4
+---Stop---
+Record num: 65600000
+---Start---
+ROP: 1008476
+WOP: 984000
+T: 34.233311
+RCS: 10
+MBC: 200
+RPP: 200
+ PHS: 4
+---Stop---
+Record num: 66100000
+---Start---
+ROP: 1016311
+WOP: 991500
+T: 34.090532
+RCS: 10
+MBC: 200
+RPP: 200
+ PHS: 4
+---Stop---
+Record num: 66600000
+---Start---
+ROP: 1024176
+WOP: 999000
+T: 34.534962
+RCS: 10
+MBC: 200
+RPP: 200
+ PHS: 4
+---Stop---
+Record num: 67100000
+---Start---
+ROP: 1032011
+WOP: 1006500
+T: 34.811197
+RCS: 10
+MBC: 200
+RPP: 200
+ PHS: 4
+---Stop---
+Record num: 67600000
+---Start---
+ROP: 1039876
+WOP: 1014000
+T: 35.157323
+RCS: 10
+MBC: 200
+RPP: 200
+ PHS: 4
+---Stop---
+Record num: 68100000
+---Start---
+ROP: 1047711
+WOP: 1021500
+T: 35.072755
+RCS: 10
+MBC: 200
+RPP: 200
+ PHS: 4
+---Stop---
+Record num: 68600000
+---Start---
+ROP: 1055576
+WOP: 1029000
+T: 35.390967
+RCS: 10
+MBC: 200
+RPP: 200
+ PHS: 4
+---Stop---
+Record num: 69100000
+---Start---
+ROP: 1063411
+WOP: 1036500
+T: 35.554655
+RCS: 10
+MBC: 200
+RPP: 200
+ PHS: 4
+---Stop---
+Record num: 69600000
+---Start---
+ROP: 1071276
+WOP: 1044000
+T: 36.397086
+RCS: 10
+MBC: 200
+RPP: 200
+ PHS: 4
+---Stop---
+Record num: 70100000
+---Start---
+ROP: 1079111
+WOP: 1051500
+T: 36.525499
+RCS: 10
+MBC: 200
+RPP: 200
+ PHS: 4
+---Stop---
+Record num: 70600000
+---Start---
+ROP: 1086976
+WOP: 1059000
+T: 36.486936
+RCS: 10
+MBC: 200
+RPP: 200
+ PHS: 4
+---Stop---
+Record num: 71100000
+---Start---
+ROP: 1094811
+WOP: 1066500
+T: 36.656817
+RCS: 10
+MBC: 200
+RPP: 200
+ PHS: 4
+---Stop---
+Record num: 71600000
+---Start---
+ROP: 1102676
+WOP: 1074000
+T: 37.043277
+RCS: 10
+MBC: 200
+RPP: 200
+ PHS: 4
+---Stop---
+Record num: 72100000
+---Start---
+ROP: 1110549
+WOP: 1081500
+T: 36.379624
+RCS: 10
+MBC: 200
+RPP: 200
+ PHS: 4
+---Stop---
+Record num: 72600000
+---Start---
+ROP: 1118453
+WOP: 1089000
+T: 37.099082
+RCS: 10
+MBC: 200
+RPP: 200
+ PHS: 4
+---Stop---
+Record num: 73100000
+---Start---
+ROP: 1126324
+WOP: 1096500
+T: 37.016521
+RCS: 10
+MBC: 200
+RPP: 200
+ PHS: 4
+---Stop---
+Record num: 73600000
+---Start---
+ROP: 1134228
+WOP: 1104000
+T: 37.220548
+RCS: 10
+MBC: 200
+RPP: 200
+ PHS: 4
+---Stop---
+Record num: 74100000
+---Start---
+ROP: 1142099
+WOP: 1111500
+T: 37.105762
+RCS: 10
+MBC: 200
+RPP: 200
+ PHS: 4
+---Stop---
+Record num: 74600000
+---Start---
+ROP: 1150003
+WOP: 1119000
+T: 37.899986
+RCS: 10
+MBC: 200
+RPP: 200
+ PHS: 4
+---Stop---
+Record num: 75100000
+---Start---
+ROP: 1157874
+WOP: 1126500
+T: 37.751159
+RCS: 10
+MBC: 200
+RPP: 200
+ PHS: 4
+---Stop---
+Record num: 75600000
+---Start---
+ROP: 1165778
+WOP: 1134000
+T: 38.619926
+RCS: 10
+MBC: 200
+RPP: 200
+ PHS: 4
+---Stop---
+Record num: 76100000
+---Start---
+ROP: 1173649
+WOP: 1141500
+T: 38.103252
+RCS: 10
+MBC: 200
+RPP: 200
+ PHS: 4
+---Stop---
+Record num: 76600000
+---Start---
+ROP: 1181553
+WOP: 1149000
+T: 38.576839
+RCS: 10
+MBC: 200
+RPP: 200
+ PHS: 4
+---Stop---
+Record num: 77100000
+---Start---
+ROP: 1189424
+WOP: 1156500
+T: 38.904240
+RCS: 10
+MBC: 200
+RPP: 200
+ PHS: 4
+---Stop---
+Record num: 77600000
+---Start---
+ROP: 1197328
+WOP: 1164000
+T: 39.253081
+RCS: 10
+MBC: 200
+RPP: 200
+ PHS: 4
+---Stop---
+Record num: 78100000
+---Start---
+ROP: 1205199
+WOP: 1171500
+T: 39.795528
+RCS: 10
+MBC: 200
+RPP: 200
+ PHS: 4
+---Stop---
+Record num: 78600000
+---Start---
+ROP: 1213103
+WOP: 1179000
+T: 39.867032
+RCS: 10
+MBC: 200
+RPP: 200
+ PHS: 4
+---Stop---
+Record num: 79100000
+---Start---
+ROP: 1220974
+WOP: 1186500
+T: 40.025773
+RCS: 10
+MBC: 200
+RPP: 200
+ PHS: 4
+---Stop---
+Record num: 79600000
+---Start---
+ROP: 1228884
+WOP: 1194000
+T: 40.302573
+RCS: 10
+MBC: 200
+RPP: 200
+ PHS: 4
+---Stop---
+Record num: 80100000
+---Start---
+ROP: 1236790
+WOP: 1201500
+T: 41.650157
+RCS: 10
+MBC: 200
+RPP: 200
+ PHS: 4
+---Stop---
+Record num: 80600000
+---Start---
+ROP: 1244733
+WOP: 1209000
+T: 41.656114
+RCS: 10
+MBC: 200
+RPP: 200
+ PHS: 4
+---Stop---
+Record num: 81100000
+---Start---
+ROP: 1252640
+WOP: 1216500
+T: 41.782596
+RCS: 10
+MBC: 200
+RPP: 200
+ PHS: 4
+---Stop---
+Record num: 81600000
+---Start---
+ROP: 1260583
+WOP: 1224000
+T: 42.454779
+RCS: 10
+MBC: 200
+RPP: 200
+ PHS: 4
+---Stop---
+Record num: 82100000
+---Start---
+ROP: 1268490
+WOP: 1231500
+T: 43.328435
+RCS: 10
+MBC: 200
+RPP: 200
+ PHS: 4
+---Stop---
+Record num: 82600000
+---Start---
+ROP: 1276433
+WOP: 1239000
+T: 42.560374
+RCS: 10
+MBC: 200
+RPP: 200
+ PHS: 4
+---Stop---
+Record num: 83100000
+---Start---
+ROP: 1284340
+WOP: 1246500
+T: 43.670632
+RCS: 10
+MBC: 200
+RPP: 200
+ PHS: 4
+---Stop---
+Record num: 83600000
+---Start---
+ROP: 1292283
+WOP: 1254000
+T: 43.574068
+RCS: 10
+MBC: 200
+RPP: 200
+ PHS: 4
+---Stop---
+Record num: 84100000
+---Start---
+ROP: 1300190
+WOP: 1261500
+T: 43.819145
+RCS: 10
+MBC: 200
+RPP: 200
+ PHS: 4
+---Stop---
+Record num: 84600000
+---Start---
+ROP: 1308133
+WOP: 1269000
+T: 43.966227
+RCS: 10
+MBC: 200
+RPP: 200
+ PHS: 4
+---Stop---
+Record num: 85100000
+---Start---
+ROP: 1316040
+WOP: 1276500
+T: 43.959818
+RCS: 10
+MBC: 200
+RPP: 200
+ PHS: 4
+---Stop---
+Record num: 85600000
+---Start---
+ROP: 1323983
+WOP: 1284000
+T: 44.364088
+RCS: 10
+MBC: 200
+RPP: 200
+ PHS: 4
+---Stop---
+Record num: 86100000
+---Start---
+ROP: 1331890
+WOP: 1291500
+T: 44.962590
+RCS: 10
+MBC: 200
+RPP: 200
+ PHS: 4
+---Stop---
+Record num: 86600000
+---Start---
+ROP: 1339833
+WOP: 1299000
+T: 45.210946
+RCS: 10
+MBC: 200
+RPP: 200
+ PHS: 4
+---Stop---
+Record num: 87100000
+---Start---
+ROP: 1347740
+WOP: 1306500
+T: 45.292148
+RCS: 10
+MBC: 200
+RPP: 200
+ PHS: 4
+---Stop---
+Record num: 87600000
+---Start---
+ROP: 1355691
+WOP: 1314000
+T: 43.905839
+RCS: 10
+MBC: 200
+RPP: 200
+ PHS: 4
+---Stop---
+Record num: 88100000
+---Start---
+ROP: 1363634
+WOP: 1321500
+T: 44.670222
+RCS: 10
+MBC: 200
+RPP: 200
+ PHS: 4
+---Stop---
+Record num: 88600000
+---Start---
+ROP: 1371616
+WOP: 1329000
+T: 44.435322
+RCS: 10
+MBC: 200
+RPP: 200
+ PHS: 4
+---Stop---
+Record num: 89100000
+---Start---
+ROP: 1379559
+WOP: 1336500
+T: 44.798251
+RCS: 10
+MBC: 200
+RPP: 200
+ PHS: 4
+---Stop---
+Record num: 89600000
+---Start---
+ROP: 1387541
+WOP: 1344000
+T: 44.969214
+RCS: 10
+MBC: 200
+RPP: 200
+ PHS: 4
+---Stop---
+Record num: 90100000
+---Start---
+ROP: 1395484
+WOP: 1351500
+T: 45.507418
+RCS: 10
+MBC: 200
+RPP: 200
+ PHS: 4
+---Stop---
+Record num: 90600000
+---Start---
+ROP: 1403466
+WOP: 1359000
+T: 45.786053
+RCS: 10
+MBC: 200
+RPP: 200
+ PHS: 4
+---Stop---
+Record num: 91100000
+---Start---
+ROP: 1411409
+WOP: 1366500
+T: 46.233602
+RCS: 10
+MBC: 200
+RPP: 200
+ PHS: 4
+---Stop---
+Record num: 91600000
+---Start---
+ROP: 1419391
+WOP: 1374000
+T: 46.001004
+RCS: 10
+MBC: 200
+RPP: 200
+ PHS: 4
+---Stop---
+Record num: 92100000
+---Start---
+ROP: 1427334
+WOP: 1381500
+T: 46.104355
+RCS: 10
+MBC: 200
+RPP: 200
+ PHS: 4
+---Stop---
+Record num: 92600000
+---Start---
+ROP: 1435316
+WOP: 1389000
+T: 46.427842
+RCS: 10
+MBC: 200
+RPP: 200
+ PHS: 4
+---Stop---
+Record num: 93100000
+---Start---
+ROP: 1443259
+WOP: 1396500
+T: 47.936282
+RCS: 10
+MBC: 200
+RPP: 200
+ PHS: 4
+---Stop---
+Record num: 93600000
+---Start---
+ROP: 1451241
+WOP: 1404000
+T: 47.707316
+RCS: 10
+MBC: 200
+RPP: 200
+ PHS: 4
+---Stop---
+Record num: 94100000
+---Start---
+ROP: 1459184
+WOP: 1411500
+T: 48.227591
+RCS: 10
+MBC: 200
+RPP: 200
+ PHS: 4
+---Stop---
+Record num: 94600000
+---Start---
+ROP: 1467166
+WOP: 1419000
+T: 48.582548
+RCS: 10
+MBC: 200
+RPP: 200
+ PHS: 4
+---Stop---
+Record num: 95100000
+---Start---
+ROP: 1475109
+WOP: 1426500
+T: 48.778463
+RCS: 10
+MBC: 200
+RPP: 200
+ PHS: 4
+---Stop---
+Record num: 95600000
+---Start---
+ROP: 1483102
+WOP: 1434000
+T: 50.727469
+RCS: 10
+MBC: 200
+RPP: 200
+ PHS: 4
+---Stop---
+Record num: 96100000
+---Start---
+ROP: 1491081
+WOP: 1441500
+T: 49.978585
+RCS: 10
+MBC: 200
+RPP: 200
+ PHS: 4
+---Stop---
+Record num: 96600000
+---Start---
+ROP: 1499102
+WOP: 1449000
+T: 49.918510
+RCS: 10
+MBC: 200
+RPP: 200
+ PHS: 4
+---Stop---
+Record num: 97100000
+---Start---
+ROP: 1507081
+WOP: 1456500
+T: 50.245096
+RCS: 10
+MBC: 200
+RPP: 200
+ PHS: 4
+---Stop---
+Record num: 97600000
+---Start---
+ROP: 1515102
+WOP: 1464000
+T: 50.533579
+RCS: 10
+MBC: 200
+RPP: 200
+ PHS: 4
+---Stop---
+Record num: 98100000
+---Start---
+ROP: 1523081
+WOP: 1471500
+T: 50.799951
+RCS: 10
+MBC: 200
+RPP: 200
+ PHS: 4
+---Stop---
+Record num: 98600000
+---Start---
+ROP: 1531102
+WOP: 1479000
+T: 50.961452
+RCS: 10
+MBC: 200
+RPP: 200
+ PHS: 4
+---Stop---
+Record num: 99100000
+---Start---
+ROP: 1539081
+WOP: 1486500
+T: 51.272380
+RCS: 10
+MBC: 200
+RPP: 200
+ PHS: 4
+---Stop---
+Record num: 99600000
+---Start---
+ROP: 1547102
+WOP: 1494000
+T: 51.305624
+RCS: 10
+MBC: 200
+RPP: 200
+ PHS: 4
+---Stop---
+Record num: 100100000
+---Start---
+ROP: 1555081
+WOP: 1501500
+T: 51.769355
+RCS: 10
+MBC: 200
+RPP: 200
+ PHS: 4
+---Stop---
+Record num: 100600000
+---Start---
+ROP: 1563102
+WOP: 1509000
+T: 52.107112
+RCS: 10
+MBC: 200
+RPP: 200
+ PHS: 4
+---Stop---

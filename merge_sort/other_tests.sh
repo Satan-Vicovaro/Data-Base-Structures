@@ -1,6 +1,6 @@
 #!/bin/bash
 
-FILE_SIZES=(167962)
+FILE_SIZES=(1679620)
 
 for file_size in "${FILE_SIZES[@]}"
 do
