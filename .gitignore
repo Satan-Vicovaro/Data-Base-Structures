@@ -13,3 +13,7 @@ merge_sort/.idea
 merge_sort/venv
 
 merge_sort/docs/Formated data
+sequential_file/.idea/*
+sequential_file/__pycache__/*
+sequential_file/src/__pycache__/*
+sequential_file/venv/
