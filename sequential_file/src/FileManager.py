@@ -1,3 +1,4 @@
+from config import CHUNK_SIZE, RECORD_SIZE
 from src.Structs import Record
 from src.IOManager import IOManager
 
@@ -5,7 +6,9 @@ from src.IOManager import IOManager
 class FileManager:
     def __init__(self, file_name) -> None:
         self.file_name = file_name
-        self.io_manager = IOManager(file_name)
+        self.io_manager = IOManager(
+            Record, filename=file_name, chunk_size=CHUNK_SIZE, record_size=RECORD_SIZE
+        )
         self.page_cache = None
 
     def show_file(self):
@@ -13,4 +16,5 @@ class FileManager:
 
     def generate_random_records(self, num=0):
         records = [Record() for _ in range(0, num)]
+        records = bytearray(b for record in records for b in bytes(record))
         self.io_manager.block_write(records)

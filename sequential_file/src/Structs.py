@@ -2,15 +2,15 @@ import secrets
 import random
 import struct
 
-import config as c
+from config import DATA_SIZE, OVERFLOW_PTR_SIZE, PAGE_KEY_SIZE, RAND_KEY_SIZE
 
 
 def random_key_gen() -> int:
-    return secrets.randbits(c.RAND_KEY_SIZE * 8)
+    return secrets.randbits(RAND_KEY_SIZE * 8)
 
 
 class Data:
-    record_size = c.DATA_SIZE
+    record_size = DATA_SIZE
 
     def __init__(self, value: str = "CCCCCCCCCC") -> None:
         self.value = value[: self.record_size].ljust(self.record_size, "C")
@@ -49,17 +49,17 @@ class Record:
             self.overflow_ptr = overflow_ptr
 
     def __bytes__(self) -> bytes:
-        fmt = f"{c.RAND_KEY_SIZE}s{c.DATA_SIZE}s{c.OVERFLOW_PTR_SIZE}s"
+        fmt = f"{RAND_KEY_SIZE}s{DATA_SIZE}s{OVERFLOW_PTR_SIZE}s"
         return struct.pack(
             fmt,
-            self.key.to_bytes(c.RAND_KEY_SIZE, "little"),
+            self.key.to_bytes(RAND_KEY_SIZE, "little"),
             bytes(self.data),
-            self.overflow_ptr.to_bytes(c.OVERFLOW_PTR_SIZE, byteorder="little"),
+            self.overflow_ptr.to_bytes(OVERFLOW_PTR_SIZE, byteorder="little"),
         )
 
     @classmethod
     def from_bytes(cls, record_list: bytes):
-        fmt = f"{c.RAND_KEY_SIZE}s{c.DATA_SIZE}s{c.OVERFLOW_PTR_SIZE}s"
+        fmt = f"{RAND_KEY_SIZE}s{DATA_SIZE}s{OVERFLOW_PTR_SIZE}s"
         key, data_bytes, overflow_ptr = struct.unpack(fmt, record_list)
         return Record(
             int.from_bytes(key, "little"),
@@ -72,3 +72,27 @@ class Record:
 
     def __repr__(self) -> str:
         return f"Record(key: {self.key:12d} data: {self.data} overflow_ptr: {self.overflow_ptr:10d})\n"
+
+
+class SparseIndex:
+    def __init__(self, key: int, page_num: int) -> None:
+        self.key: int = key
+        self.page_num: int = page_num
+
+    @classmethod
+    def from_bytes(cls, sparse_index_bytes: bytes):
+        fmt = f"{RAND_KEY_SIZE}s{PAGE_KEY_SIZE}s"
+        key, page_num = struct.unpack(fmt, sparse_index_bytes)
+        return SparseIndex(
+            int.from_bytes(key, "little"), int.from_bytes(page_num, "little")
+        )
+
+    def __bytes__(self) -> bytes:
+        fmt = f"{RAND_KEY_SIZE}s{PAGE_KEY_SIZE}s"
+        return struct.pack(fmt, int.to_bytes(self.key), int.to_bytes(self.page_num))
+
+    def __str__(self) -> str:
+        return f"SparseIndex(key: {self.key:10}, page_num: {self.page_num:10})"
+
+    def __repr__(self) -> str:
+        return f"SparseIndex(key: {self.key}, page_num: {self.page_num})"
