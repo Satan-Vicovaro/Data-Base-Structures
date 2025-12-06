@@ -3,10 +3,10 @@
 struct Config {
 private:
   Config() {
-    debug = false;
+    debug = true;
     record_char_size = 10;
-    max_buffer_count = 50;
-    records_per_page = 400;
+    max_buffer_count = 10;
+    records_per_page = 100;
     page_size = record_char_size * records_per_page;
   }
 

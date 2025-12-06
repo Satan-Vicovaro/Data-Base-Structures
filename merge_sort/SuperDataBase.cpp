@@ -162,6 +162,11 @@ void SuperDataBase::sort_data() {
       }
     }
 
+    if (Config::vals().debug) {
+      std::cout << "Phase two:\n";
+      secondary_belt_.print_whole_file_readable();
+    }
+
     if (!one_run_left) {
       std::swap(main_belt_, secondary_belt_);
       secondary_belt_.truncate_file();
