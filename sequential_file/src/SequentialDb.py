@@ -1,6 +1,7 @@
-import struct
-from src.SparseIndexMap import SparseIndexMap
-from src.FileManager import FileManager
+import pathlib
+from src.Structs import Record
+from src.SparseIndexMap import FindPlaceStatus, SparseIndexMap
+from src.FileManager import FileManager, PageFindStatus
 import cmd
 
 
@@ -21,7 +22,8 @@ class SequentialDb(cmd.Cmd):
         self.main_file.generate_random_records(20)
 
     def do_add_key(self, arg: str):
-        self.add_key(arg)
+        key, data = arg.split(" ", maxsplit=2)
+        self.add_key(Record(int(key), data))
 
     def do_help(self, arg: str) -> bool | None:
         return super().do_help(arg)
@@ -31,16 +33,36 @@ class SequentialDb(cmd.Cmd):
         print("bye")
         return True
 
+    def do_a(self, arg: str):
+        self.add_key(Record())
+
     def do_q(self, arg: str):
         "Quits program"
         print("bye")
         return True
 
-    def add_key(self, arg: str):
-        try:
-            key, data = arg.split(" ", maxsplit=2)
-        except:
-            print("Wrong values")
+    def add_key(self, record: Record):
+        status, place = self.sparse_index_map.find_place(record.key)
+
+        if status == FindPlaceStatus.FILE_IS_EMPTY:
+            self.sparse_index_map.initialize(record, self.main_file)
+            return
+        if status == FindPlaceStatus.KEY_EXSITS:
+            print("Key exsists, aborting")
+            return
+        if status == FindPlaceStatus.SMALLEST_IN_FILE:
+            print("Handle smallest in the file")
+            return
+
+        if status == FindPlaceStatus.IN_MIDDLE:
+            page_status = self.main_file.find_on_page(record, place.page_index)
+
+            if page_status == PageFindStatus.FILE_IS_FULL:
+                print("Create new page and add key there")
+                return
+
+            if page_status == PageFindStatus.FREE_SPACE_TO_APPEND:
+                self.main_file.append_to_current(record, place.page_index)
 
     def start(self):
         try:

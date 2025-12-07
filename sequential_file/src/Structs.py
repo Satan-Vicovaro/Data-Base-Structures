@@ -40,8 +40,10 @@ class Record:
 
         if data == None:
             self.data = Data.random_record()
-        else:
+        elif isinstance(data, Data):
             self.data = data
+        else:
+            self.data = Data(data)
 
         if overflow_ptr == None:
             self.overflow_ptr: int = 0
@@ -75,24 +77,24 @@ class Record:
 
 
 class SparseIndex:
-    def __init__(self, key: int, page_num: int) -> None:
+    def __init__(self, key: int, page_index: int) -> None:
         self.key: int = key
-        self.page_num: int = page_num
+        self.page_index: int = page_index
 
     @classmethod
     def from_bytes(cls, sparse_index_bytes: bytes):
         fmt = f"{RAND_KEY_SIZE}s{PAGE_KEY_SIZE}s"
-        key, page_num = struct.unpack(fmt, sparse_index_bytes)
+        key, page_index = struct.unpack(fmt, sparse_index_bytes)
         return SparseIndex(
-            int.from_bytes(key, "little"), int.from_bytes(page_num, "little")
+            int.from_bytes(key, "little"), int.from_bytes(page_index, "little")
         )
 
     def __bytes__(self) -> bytes:
         fmt = f"{RAND_KEY_SIZE}s{PAGE_KEY_SIZE}s"
-        return struct.pack(fmt, int.to_bytes(self.key), int.to_bytes(self.page_num))
+        return struct.pack(fmt, int.to_bytes(self.key), int.to_bytes(self.page_index))
 
     def __str__(self) -> str:
-        return f"SparseIndex(key: {self.key:10}, page_num: {self.page_num:10})"
+        return f"SparseIndex(key: {self.key:10}, page_index: {self.page_index:10})"
 
     def __repr__(self) -> str:
-        return f"SparseIndex(key: {self.key}, page_num: {self.page_num})"
+        return f"SparseIndex(key: {self.key}, page_index: {self.page_index})"
