@@ -1,5 +1,6 @@
 import bisect
 from enum import Enum
+from pathlib import PosixPath
 from config import CHUNK_SIZE, RECORD_SIZE, RECORDS_PER_CHUNK
 from src.Structs import Record
 from src.IOManager import IOManager
@@ -21,6 +22,7 @@ class FileManager:
         )
         self.page_cache = None
         self.cache_page_index: int = 0
+        self.all_pages_full = True
 
     def show_file(self):
         print(list(self.io_manager.read_whole_file()))
@@ -35,6 +37,7 @@ class FileManager:
         pass
 
     def initialize(self, record: Record):
+        self.all_pages_full = True
         self.io_manager.append_to_file([record])
 
     def find_on_page(self, record: Record, page_index: int):
@@ -60,15 +63,17 @@ class FileManager:
         if closest_record.key == record.key:
             return PageFindStatus.VALUE_EXIST
 
-        if closest_record.key < record.key and page_size == RECORDS_PER_CHUNK:
+        if index == RECORDS_PER_CHUNK - 1:
             return PageFindStatus.FILE_IS_FULL
 
-        if closest_record.key < record.key and page_size < RECORDS_PER_CHUNK:
+        if index == page_size - 1:
             return PageFindStatus.FREE_SPACE_TO_APPEND
 
         return PageFindStatus.IN_OVERFLOW
 
     def append_to_current(self, record: Record, page_index: int):
+
+        self.all_pages_full = False
         if page_index != self.cache_page_index:
             print("Why are you inserting to the same page? Aborting")
             return

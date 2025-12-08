@@ -88,7 +88,7 @@ class IOManager:
 
     def write_page(self, block, page_index):
         byte_data = bytearray(data for record in block for data in bytes(record))
-        with open(self.filename, "a+b", buffering=self.chunk_size) as f:
+        with open(self.filename, "r+b", buffering=self.chunk_size) as f:
             f.seek(page_index * self.chunk_size)
             f.write(byte_data)
 

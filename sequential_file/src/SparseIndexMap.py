@@ -42,6 +42,9 @@ class SparseIndexMap:
 
         return (FindPlaceStatus.IN_MIDDLE, place)
 
+    def add_to_end(self, record: Record):
+        pass
+
     def initialize(self, record: Record, main_file: FileManager):
         self.sparseIndexes.append(SparseIndex(record.key, 0))
         main_file.initialize(record)

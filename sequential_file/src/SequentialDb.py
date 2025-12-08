@@ -63,6 +63,18 @@ class SequentialDb(cmd.Cmd):
 
             if page_status == PageFindStatus.FREE_SPACE_TO_APPEND:
                 self.main_file.append_to_current(record, place.page_index)
+                return
+
+            if page_status == PageFindStatus.IN_OVERFLOW:
+                print("In overflow")
+                return
+
+            if page_status == PageFindStatus.VALUE_EXIST:
+                print("Value exsits, aborting")
+                return
+            if status == PageFindStatus.EMPTY_FILE:
+                print("LOL")
+                return
 
     def start(self):
         try:
