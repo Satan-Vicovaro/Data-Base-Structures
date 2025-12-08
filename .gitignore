@@ -17,3 +17,5 @@ sequential_file/.idea/*
 sequential_file/__pycache__/*
 sequential_file/src/__pycache__/*
 sequential_file/venv/
+
+.idea
