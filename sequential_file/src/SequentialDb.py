@@ -11,12 +11,15 @@ class SequentialDb(cmd.Cmd):
 
     def __init__(self) -> None:
         super().__init__()
-        self.main_file = FileManager("main_file.txt")
-        self.overflow_file = FileManager("overflow_file.txt")
+        self.main_file = FileManager("main_file.bin")
+        self.overflow_file = FileManager("overflow_file.bin")
         self.sparse_index_map = SparseIndexMap()
 
     def do_show(self, arg: str):
+        print("Main File")
         self.main_file.show_file()
+        print("\n Overflow File")
+        self.overflow_file.show_file()
 
     def do_gen(self, arg: str):
         # self.main_file.generate_random_records(20)

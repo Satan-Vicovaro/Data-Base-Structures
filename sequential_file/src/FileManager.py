@@ -27,7 +27,8 @@ class FileManager:
         self.all_pages_full = True
 
     def show_file(self):
-        print(list(self.io_manager.read_whole_file()))
+        for record, i in enumerate(self.io_manager.read_whole_file()):
+            print(f"{i} : {record}")
 
     # def generate_random_records(self, num=0):
     #     records = [Record() for _ in range(0, num)]

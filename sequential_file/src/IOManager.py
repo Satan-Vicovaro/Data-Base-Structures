@@ -27,7 +27,7 @@ class IOManager:
             f.write("")
 
     def read_page(self, page_index=0):
-        with open(self.filename, "rb", buffering=self.chunk_size) as f:
+        with open(self.filename, "r+b", buffering=self.chunk_size) as f:
             f.seek(page_index * self.chunk_size)
             raw_data = f.read(self.chunk_size)
             raw_data = [
@@ -44,7 +44,7 @@ class IOManager:
         file_stats = pathlib.Path(self.filename).stat()
         page_index = file_stats.st_size // self.chunk_size
 
-        with open(self.filename, "rb", buffering=self.chunk_size) as f:
+        with open(self.filename, "r+b", buffering=self.chunk_size) as f:
             f.seek(page_index * self.chunk_size)
             raw_data = f.read(self.chunk_size)
             raw_data = [
@@ -62,7 +62,7 @@ class IOManager:
         return math.ceil(file_stats.st_size / self.chunk_size)
 
     def chunk_read(self, start: int = 0):
-        with open(self.filename, "rb", buffering=self.chunk_size) as f:
+        with open(self.filename, "r+b", buffering=self.chunk_size) as f:
             f.seek(start)
             raw_data = f.read(self.chunk_size)
             file_pos = f.tell()

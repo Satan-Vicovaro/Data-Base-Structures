@@ -17,7 +17,7 @@ class SparseIndexMap:
     def __init__(self) -> None:
         self.io_manager = IOManager(
             SparseIndex,
-            "sparse_index_map.txt",
+            "sparse_index_map.bin",
             chunk_size=SPARSE_INDEX_CHUNK_SIZE,
             record_size=INDEX_SIZE,
         )

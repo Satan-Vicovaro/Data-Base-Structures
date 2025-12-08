@@ -54,7 +54,7 @@ class Record:
         fmt = f"{RAND_KEY_SIZE}s{DATA_SIZE}s{OVERFLOW_PTR_SIZE}s"
         return struct.pack(
             fmt,
-            self.key.to_bytes(RAND_KEY_SIZE, "little"),
+            self.key.to_bytes(RAND_KEY_SIZE, byteorder="little"),
             bytes(self.data),
             self.overflow_ptr.to_bytes(OVERFLOW_PTR_SIZE, byteorder="little"),
         )
@@ -65,15 +65,15 @@ class Record:
         key, data_bytes, overflow_ptr = struct.unpack(fmt, record_list)
         return Record(
             int.from_bytes(key, "little"),
-            Data(str(data_bytes)),
+            Data(data_bytes.decode("ASCII")),
             int.from_bytes(overflow_ptr, "little"),
         )
 
     def __str__(self) -> str:
-        return f"key: {self.key:12d} data: {self.data} overflow_ptr: {self.overflow_ptr:10d}\n"
+        return f"key: {self.key:12d} data: {self.data} overflow_ptr: {self.overflow_ptr:10d}"
 
     def __repr__(self) -> str:
-        return f"Record(key: {self.key:12d} data: {self.data} overflow_ptr: {self.overflow_ptr:10d})\n"
+        return f"Record(key: {self.key:} data: {self.data} overflow_ptr: {self.overflow_ptr:})"
 
 
 class SparseIndex:
@@ -91,7 +91,11 @@ class SparseIndex:
 
     def __bytes__(self) -> bytes:
         fmt = f"{RAND_KEY_SIZE}s{PAGE_KEY_SIZE}s"
-        return struct.pack(fmt, int.to_bytes(self.key), int.to_bytes(self.page_index))
+        return struct.pack(
+            fmt,
+            int.to_bytes(self.key, byteorder="little"),
+            int.to_bytes(self.page_index, byteorder="little"),
+        )
 
     def __str__(self) -> str:
         return f"SparseIndex(key: {self.key:10}, page_index: {self.page_index:10})"
