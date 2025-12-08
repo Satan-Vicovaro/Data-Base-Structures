@@ -1,6 +1,8 @@
 from functools import cached_property
 import pathlib
 import math
+from typing import List
+from config import CHUNK_SIZE, RECORD_SIZE
 from src.Structs import Record
 
 
@@ -40,7 +42,7 @@ class IOManager:
 
     def read_last_page(self):
         file_stats = pathlib.Path(self.filename).stat()
-        page_index = math.ceil(file_stats.st_size / self.chunk_size)
+        page_index = file_stats.st_size // self.chunk_size
 
         with open(self.filename, "rb", buffering=self.chunk_size) as f:
             f.seek(page_index * self.chunk_size)
@@ -54,6 +56,10 @@ class IOManager:
         data_list = [self.target_class.from_bytes(b) for b in raw_data]
         for data in data_list:
             yield data
+
+    def get_last_page_index(self):
+        file_stats = pathlib.Path(self.filename).stat()
+        return math.ceil(file_stats.st_size / self.chunk_size)
 
     def chunk_read(self, start: int = 0):
         with open(self.filename, "rb", buffering=self.chunk_size) as f:
@@ -72,7 +78,6 @@ class IOManager:
         return (data, file_pos, eof)
 
     def read_whole_file(self):
-
         current_file_pos = 0
         eof = False
         while not eof:
@@ -81,14 +86,26 @@ class IOManager:
             for record in records:
                 yield record
 
-    def write_block(self, block):
-        byte_data = bytearray(data for record in block for data in bytes(record))
-        with open(self.filename, "a+b", buffering=self.chunk_size) as f:
-            f.write(byte_data)
+    # def write_block(self, block):
+    #     if isinstance(block, List):
+    #         byte_data = bytearray(data for record in block for data in bytes(record))
+    #     else:
+    #         byte_data = bytes(block)
+    #
+    #     with open(self.filename, "a+b", buffering=self.chunk_size) as f:
+    #         f.write(byte_data)
 
     def write_page(self, block, page_index):
         byte_data = bytearray(data for record in block for data in bytes(record))
         with open(self.filename, "r+b", buffering=self.chunk_size) as f:
+            f.seek(page_index * self.chunk_size)
+            f.write(byte_data)
+
+    def write_last_page(self, block):
+        file_stats = pathlib.Path(self.filename).stat()
+        page_index = file_stats.st_size // self.chunk_size
+        byte_data = bytearray(data for record in block for data in bytes(record))
+        with open(self.filename, "r+b") as f:
             f.seek(page_index * self.chunk_size)
             f.write(byte_data)
 
@@ -100,3 +117,11 @@ class IOManager:
         file_stats = pathlib.Path(self.filename).stat()
         page_index = math.ceil(file_stats.st_size / self.chunk_size)
         return page_index
+
+    def get_record_num(self) -> int:
+        path = pathlib.Path(self.filename)
+        file_size = path.stat().st_size
+        if file_size % self.record_size != 0:
+            print("There is error on page layout")
+            return 1
+        return file_size // self.record_size

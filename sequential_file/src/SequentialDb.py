@@ -19,7 +19,8 @@ class SequentialDb(cmd.Cmd):
         self.main_file.show_file()
 
     def do_gen(self, arg: str):
-        self.main_file.generate_random_records(20)
+        # self.main_file.generate_random_records(20)
+        pass
 
     def do_add_key(self, arg: str):
         key, data = arg.split(" ", maxsplit=2)
@@ -32,6 +33,19 @@ class SequentialDb(cmd.Cmd):
         "Quits program"
         print("bye")
         return True
+
+    def do_t1(self, arg: str):
+        self.add_key(Record(5, "5"))
+        self.add_key(Record(10, "10"))
+        self.add_key(Record(15, "15"))
+        self.add_key(Record(20, "20"))
+        self.add_key(Record(30, "30"))
+        self.add_key(Record(6, "6"))
+        self.add_key(Record(7, "7"))
+        self.add_key(Record(11, "11"))
+        self.add_key(Record(12, "12"))
+        self.add_key(Record(16, "13"))
+        self.add_key(Record(21, "21"))
 
     def do_a(self, arg: str):
         self.add_key(Record())
@@ -55,7 +69,9 @@ class SequentialDb(cmd.Cmd):
             return
 
         if status == FindPlaceStatus.IN_MIDDLE:
-            page_status = self.main_file.find_on_page(record, place.page_index)
+            page_status, closest_record = self.main_file.find_on_page(
+                record, place.page_index
+            )
 
             if page_status == PageFindStatus.FILE_IS_FULL:
                 print("Create new page and add key there")
@@ -66,7 +82,9 @@ class SequentialDb(cmd.Cmd):
                 return
 
             if page_status == PageFindStatus.IN_OVERFLOW:
-                print("In overflow")
+                record_number = self.overflow_file.append_to_end(record)
+                closest_record.overflow_ptr = record_number
+                self.main_file.update_record(closest_record)
                 return
 
             if page_status == PageFindStatus.VALUE_EXIST:

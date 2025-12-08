@@ -30,7 +30,6 @@ class SparseIndexMap:
             return (FindPlaceStatus.FILE_IS_EMPTY, SparseIndex(0, 0))
 
         index = bisect.bisect_right(self.sparseIndexes, key, key=lambda u: u.key) - 1
-        # if index == array_size:
 
         place = self.sparseIndexes[index]
 
