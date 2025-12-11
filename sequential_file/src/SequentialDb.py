@@ -11,15 +11,13 @@ class SequentialDb(cmd.Cmd):
 
     def __init__(self) -> None:
         super().__init__()
-        self.main_file = FileManager("main_file.bin")
-        self.overflow_file = FileManager("overflow_file.bin")
         self.sparse_index_map = SparseIndexMap()
 
     def do_show(self, arg: str):
-        print("Main File")
-        self.main_file.show_file()
-        print("\n Overflow File")
-        self.overflow_file.show_file()
+        self.sparse_index_map.show_file()
+
+    def do_proper_show(self, arg: str):
+        self.iterate_over_all()
 
     def do_gen(self, arg: str):
         # self.main_file.generate_random_records(20)
@@ -59,43 +57,10 @@ class SequentialDb(cmd.Cmd):
         return True
 
     def add_key(self, record: Record):
-        status, place = self.sparse_index_map.find_place(record.key)
+        self.sparse_index_map.add_key(record)
 
-        if status == FindPlaceStatus.FILE_IS_EMPTY:
-            self.sparse_index_map.initialize(record, self.main_file)
-            return
-        if status == FindPlaceStatus.KEY_EXSITS:
-            print("Key exsists, aborting")
-            return
-        if status == FindPlaceStatus.SMALLEST_IN_FILE:
-            print("Handle smallest in the file")
-            return
-
-        if status == FindPlaceStatus.IN_MIDDLE:
-            page_status, closest_record = self.main_file.find_on_page(
-                record, place.page_index
-            )
-
-            if page_status == PageFindStatus.FILE_IS_FULL:
-                print("Create new page and add key there")
-                return
-
-            if page_status == PageFindStatus.FREE_SPACE_TO_APPEND:
-                self.main_file.append_to_current(record, place.page_index)
-                return
-
-            if page_status == PageFindStatus.IN_OVERFLOW:
-                record_number = self.overflow_file.append_to_end(record)
-                closest_record.overflow_ptr = record_number
-                self.main_file.update_record(closest_record)
-                return
-
-            if page_status == PageFindStatus.VALUE_EXIST:
-                print("Value exsits, aborting")
-                return
-            if status == PageFindStatus.EMPTY_FILE:
-                print("LOL")
-                return
+    def iterate_over_all(self):
+        print("todo: implement inerate over all")
 
     def start(self):
         try:

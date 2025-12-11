@@ -30,11 +30,6 @@ class FileManager:
         for record, i in enumerate(self.io_manager.read_whole_file()):
             print(f"{i} : {record}")
 
-    # def generate_random_records(self, num=0):
-    #     records = [Record() for _ in range(0, num)]
-    #     records = bytearray(b for record in records for b in bytes(record))
-    #     self.io_manager.write_block(records)
-
     def add_to_new_page(self, record: Record):
         page_num = self.io_manager.append_to_file(record)
         pass
@@ -102,3 +97,6 @@ class FileManager:
             return
         self.cache_page[index] = record
         self.io_manager.write_page(self.cache_page, self.cache_page_index)
+
+    def page_iter(self):
+        yield self.io_manager.read_whole_file()
