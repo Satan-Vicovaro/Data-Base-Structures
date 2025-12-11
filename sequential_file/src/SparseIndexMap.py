@@ -1,6 +1,7 @@
+import pathlib
 from config import INDEX_SIZE, SPARSE_INDEX_CHUNK_SIZE
 from src.FileManager import FileManager, PageFindStatus
-from src.Structs import Record, SparseIndex
+from src.Structs import Page, Record, SparseIndex
 from src.IOManager import IOManager
 from enum import Enum
 import bisect
@@ -85,18 +86,66 @@ class SparseIndexMap:
                 return
 
             if page_status == PageFindStatus.IN_OVERFLOW:
-                record_number = self.overflow_file.append_to_end(record)
-                closest_record.overflow_ptr = record_number
-                self.main_file.update_record(closest_record)
+                self.iterate_overflow(self.main_file.cache_page, closest_record, record)
                 return
 
             if page_status == PageFindStatus.VALUE_EXIST:
                 print("Value exsits, aborting")
                 return
+
             if status == PageFindStatus.EMPTY_FILE:
                 print("LOL")
                 return
 
-    def iterate_overflow(self, current_page, next_page, record: Record):
+    def iterate_overflow(
+        self, current_page: Page, current_record: Record, record_to_add: Record
+    ):
+        found_place = False
 
-        pass
+        while True:
+            if current_record.overflow_ptr == 0:
+
+                overflow_ptr_to_record_to_add = (
+                    self.overflow_file.get_next_overflow_ptr()
+                )
+                current_record.overflow_ptr = overflow_ptr_to_record_to_add
+                current_page.update_record(current_record)
+                self.main_file.write_updated_page(current_page)
+                self.overflow_file.append_to_end(record_to_add)
+                break
+
+            next_page, next_record = self.overflow_file.get_page_and_record_from_ptr(
+                current_record.overflow_ptr
+            )
+
+            if next_record.key == record_to_add.key:
+                print("Value exsits aborting")
+                break
+
+            if next_record.key > record_to_add.key:
+                record_to_add.overflow_ptr = current_record.overflow_ptr
+
+                overflow_ptr_to_record_to_add = (
+                    self.overflow_file.io_manager.get_record_num()
+                )
+                current_record.overflow_ptr = overflow_ptr_to_record_to_add
+
+                current_page.update_record(current_record)
+
+                self.overflow_file.write_updated_page(current_page)
+                self.overflow_file.append_to_end(record_to_add)
+                break
+
+            if next_record.overflow_ptr == 0:
+                overflow_ptr_to_record_to_add = (
+                    self.overflow_file.get_next_overflow_ptr()
+                )
+                next_record.overflow_ptr = overflow_ptr_to_record_to_add
+                next_page.update_record(next_record)
+
+                self.overflow_file.write_updated_page(next_page)
+                self.overflow_file.append_to_end(record_to_add)
+                break
+
+            current_page = next_page
+            current_record = next_record

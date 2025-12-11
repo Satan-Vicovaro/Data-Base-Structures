@@ -3,7 +3,7 @@ import pathlib
 import math
 from typing import List
 from config import CHUNK_SIZE, RECORD_SIZE
-from src.Structs import Record
+from src.Structs import Page, Record
 
 
 class IOManager:
@@ -37,8 +37,7 @@ class IOManager:
 
         # return raw_data
         data_list = [self.target_class.from_bytes(b) for b in raw_data]
-        for data in data_list:
-            yield data
+        return Page(data_list, page_index)
 
     def read_last_page(self):
         file_stats = pathlib.Path(self.filename).stat()
@@ -54,8 +53,7 @@ class IOManager:
 
         # return raw_data
         data_list = [self.target_class.from_bytes(b) for b in raw_data]
-        for data in data_list:
-            yield data
+        return Page(data_list, page_index)
 
     def get_last_page_index(self):
         file_stats = pathlib.Path(self.filename).stat()
@@ -86,31 +84,22 @@ class IOManager:
             for record in records:
                 yield record
 
-    # def write_block(self, block):
-    #     if isinstance(block, List):
-    #         byte_data = bytearray(data for record in block for data in bytes(record))
-    #     else:
-    #         byte_data = bytes(block)
-    #
-    #     with open(self.filename, "a+b", buffering=self.chunk_size) as f:
-    #         f.write(byte_data)
-
-    def write_page(self, block, page_index):
-        byte_data = bytearray(data for record in block for data in bytes(record))
+    def write_page(self, page: Page):
+        byte_data = bytearray(data for record in page.records for data in bytes(record))
         with open(self.filename, "r+b", buffering=self.chunk_size) as f:
-            f.seek(page_index * self.chunk_size)
+            f.seek(page.page_index * self.chunk_size)
             f.write(byte_data)
 
-    def write_last_page(self, block):
+    def write_last_page(self, page: Page):
         file_stats = pathlib.Path(self.filename).stat()
         page_index = file_stats.st_size // self.chunk_size
-        byte_data = bytearray(data for record in block for data in bytes(record))
+        byte_data = bytearray(data for record in page.records for data in bytes(record))
         with open(self.filename, "r+b") as f:
             f.seek(page_index * self.chunk_size)
             f.write(byte_data)
 
-    def append_to_file(self, block) -> int:
-        byte_data = bytearray(data for record in block for data in bytes(record))
+    def append_to_file(self, page: Page) -> int:
+        byte_data = bytearray(data for record in page.records for data in bytes(record))
         with open(self.filename, "a+b", buffering=self.chunk_size) as f:
             f.write(byte_data)
 

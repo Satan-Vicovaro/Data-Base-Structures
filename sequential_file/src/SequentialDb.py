@@ -48,6 +48,27 @@ class SequentialDb(cmd.Cmd):
         self.add_key(Record(16, "13"))
         self.add_key(Record(21, "21"))
 
+    def do_t2(self, arg: str):
+        self.add_key(Record(10, "10"))
+        self.add_key(Record(20, "20"))
+        for i in range(11, 20):
+            self.add_key(Record(i, str(i)))
+
+    def do_t3(self, arg: str):
+        self.add_key(Record(10, "10"))
+        self.add_key(Record(20, "20"))
+        self.add_key(Record(30, "30"))
+
+        for i in range(1, 6):
+            self.add_key(Record(10 + i, str(10 + i)))
+            self.add_key(Record(20 + i, str(20 + i)))
+
+    def do_t4(self, arg: str):
+        self.add_key(Record(10, "10"))
+        self.add_key(Record(100, "20"))
+        for i in range(11, 100):
+            self.add_key(Record(i, str(i)))
+
     def do_a(self, arg: str):
         self.add_key(Record())
 

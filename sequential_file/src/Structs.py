@@ -1,3 +1,4 @@
+import bisect
 import secrets
 import random
 import struct
@@ -102,3 +103,27 @@ class SparseIndex:
 
     def __repr__(self) -> str:
         return f"SparseIndex(key: {self.key}, page_index: {self.page_index})"
+
+
+class Page:
+
+    def __init__(self, records: list[Record], page_index: int) -> None:
+        self.records = records
+        self.page_index = page_index
+
+    def update_record(self, record: Record):
+        updated = False
+        for record_to_update in self.records:
+            if record_to_update.key == record.key:
+                record_to_update = record
+                updated = True
+                break
+
+        if not updated:
+            print("Value does not exist")
+
+    def exist(self, record):
+        if record in self.records:
+            return True
+
+        return False
