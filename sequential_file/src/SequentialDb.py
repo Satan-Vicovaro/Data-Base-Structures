@@ -1,4 +1,5 @@
 import pathlib
+import re
 from src.Structs import Record
 from src.SparseIndexMap import FindPlaceStatus, SparseIndexMap
 from src.FileManager import FileManager, PageFindStatus
@@ -131,8 +132,12 @@ class SequentialDb(cmd.Cmd):
     def add_key(self, record: Record):
         self.sparse_index_map.add_key(record)
 
-    def iterate_over_all(self):
-        print("todo: implement inerate over all")
+    def do_find(self, arg: str):
+        record = self.sparse_index_map.find_record(int(arg))
+        if record is None:
+            print("Value does not exist")
+            return
+        print(f"Found: {record}")
 
     def check_proper_order(self):
         for (cur_record, _), (next_record, _) in pairwise(

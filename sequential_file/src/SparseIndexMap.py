@@ -1,4 +1,5 @@
 import pathlib
+import re
 from config import INDEX_SIZE, SPARSE_INDEX_CHUNK_SIZE
 from src.FileManager import FileManager, PageFindStatus
 from src.Structs import Page, Record, SparseIndex
@@ -99,6 +100,26 @@ class SparseIndexMap:
             if status == PageFindStatus.EMPTY_FILE:
                 print("Error: I should not be here!")
                 return
+
+    def find_record(self, key: int) -> Record | None:
+        map_status, sparse_index = self.find_place(key)
+
+        if map_status == FindPlaceStatus.FILE_IS_EMPTY:
+            return None
+        if map_status == FindPlaceStatus.SMALLEST_IN_FILE:
+            return None
+
+        page_status, closest_record = self.main_file.find_on_page(
+            Record(key, "", 0), sparse_index.page_index
+        )
+
+        if page_status == PageFindStatus.VALUE_EXIST:
+            return closest_record
+        if page_status == PageFindStatus.IN_OVERFLOW:
+            for overflow_val, depth in self.iter_overflow(closest_record):
+                if overflow_val.key == key:
+                    return overflow_val
+        return None
 
     def add_overflow(
         self, current_page: Page, current_record: Record, record_to_add: Record
