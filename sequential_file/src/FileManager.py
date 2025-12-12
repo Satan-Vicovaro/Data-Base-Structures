@@ -57,25 +57,21 @@ class FileManager:
 
         closest_record = page.records[index]
 
-        if closest_record.key == record.key:
+        if page.exist(record):
             return PageFindStatus.VALUE_EXIST, closest_record
 
-        if index == RECORDS_PER_CHUNK - 1:
-            return PageFindStatus.FILE_IS_FULL, closest_record
-
-        if index == page_size - 1:
+        if page.can_insert():
             return PageFindStatus.FREE_SPACE_TO_APPEND, closest_record
 
         return PageFindStatus.IN_OVERFLOW, closest_record
 
     def append_to_current(self, record: Record, page_index: int):
-
         self.all_pages_full = False
         if page_index != self.cache_page.page_index:
             print("Why are you NOT inserting to the same page? Aborting")
             return
 
-        self.cache_page.records.append(record)
+        self.cache_page.insert(record)
         self.io_manager.write_page(self.cache_page)
 
     def append_to_end(self, record: Record):
@@ -106,7 +102,7 @@ class FileManager:
     def get_page_and_record_from_ptr(self, overflow_ptr: int):
         if overflow_ptr == 0:
             print("Wrong overflow ptr")
-            return
+            return self.cache_page, Record.empty_record()
 
         overflow_ptr -= 1
         page_index = overflow_ptr // RECORDS_PER_CHUNK
