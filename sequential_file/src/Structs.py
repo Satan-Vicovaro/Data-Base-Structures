@@ -2,8 +2,16 @@ import bisect
 import secrets
 import random
 import struct
+from typing import dataclass_transform
 
-from config import DATA_SIZE, OVERFLOW_PTR_SIZE, PAGE_KEY_SIZE, RAND_KEY_SIZE
+from config import (
+    DATA_SIZE,
+    OVERFLOW_PTR_SIZE,
+    PAGE_KEY_SIZE,
+    RAND_KEY_SIZE,
+    RECORD_SIZE,
+    RECORDS_PER_CHUNK,
+)
 
 
 def random_key_gen() -> int:
@@ -70,6 +78,34 @@ class Record:
             int.from_bytes(overflow_ptr, "little"),
         )
 
+    @classmethod
+    def random_record(cls):
+        key = random_key_gen()
+        data = Data.random_record()
+        overflow_ptr = 0
+        return Record(key, data, overflow_ptr)
+
+    @classmethod
+    def empty_record(cls):
+        key = 0
+        data = Data(str(b"\0" * RECORD_SIZE))
+        overflow_ptr = 0
+        return Record(key, data, overflow_ptr)
+
+    def is_empty(self) -> bool:
+        if (
+            self.key == 0
+            and self.data.value == str(b"\0" * RECORD_SIZE)
+            and self.overflow_ptr == 0
+        ):
+            return True
+        return False
+
+    def is_deleted(self) -> bool:
+        if self.key != 0 and self.data.value == str(b"\0" * RECORD_SIZE):
+            return True
+        return False
+
     def __str__(self) -> str:
         return f"key: {self.key:12d} data: {self.data} overflow_ptr: {self.overflow_ptr:10d}"
 
@@ -120,10 +156,18 @@ class Page:
                 break
 
         if not updated:
-            print("Value does not exist")
+            print("Value does not exist!!!")
 
     def exist(self, record):
         if record in self.records:
             return True
 
         return False
+
+    def insert(self, record: Record):
+        index = bisect.bisect_right(self.records, record.key, key=lambda l: l.key)
+        self.records.insert(index, record)
+
+    def can_insert(self, record: Record) -> bool:
+
+        pass
