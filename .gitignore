@@ -19,3 +19,6 @@ sequential_file/src/__pycache__/*
 sequential_file/venv/
 
 .idea
+sequential_file/main_file.bin
+sequential_file/overflow_file.bin
+sequential_file/sparse_index_map.bin
