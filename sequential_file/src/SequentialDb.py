@@ -92,7 +92,7 @@ class SequentialDb(cmd.Cmd):
 
         self.check_proper_order()
 
-    def do_t6(self, arg: str):
+    def do_t6(self, arg: str = "10"):
         self.add_key(Record(0, "0"))
         for _ in range(0, int(arg)):
             self.add_key(Record.random_record())
@@ -106,8 +106,22 @@ class SequentialDb(cmd.Cmd):
         self.add_key(Record(12, "12"))
         self.check_proper_order()
 
+    def do_t8(self, arg: str):
+        self.add_key(Record(0, "0"))
+        for _ in range(50):
+            self.add_key(Record.random_record())
+        self.do_reorganize("")
+        for _ in range(50):
+            self.add_key(Record.random_record())
+        self.check_proper_order()
+        self.do_reorganize("")
+        self.check_proper_order()
+
     def do_a(self, arg: str):
-        self.add_key(Record())
+        self.add_key(Record.random_record())
+
+    def do_reorganize(self, arg: str):
+        self.sparse_index_map.reorganize()
 
     def do_q(self, arg: str):
         "Quits program"
@@ -124,7 +138,7 @@ class SequentialDb(cmd.Cmd):
         for (cur_record, _), (next_record, _) in pairwise(
             self.sparse_index_map.iter_all()
         ):
-            if cur_record.key > next_record.key:
+            if cur_record.key >= next_record.key:
                 print("Values are not sorted proprely!!")
                 return
         print("With proper order pass")

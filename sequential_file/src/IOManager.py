@@ -1,4 +1,5 @@
 from functools import cached_property
+from os import set_blocking
 import pathlib
 import math
 from typing import List
@@ -24,6 +25,19 @@ class IOManager:
 
         # if not pathlib.Path(filename).exists():
         with open(filename, "w") as f:
+            f.write("")
+
+    def delete(self):
+        file = pathlib.Path(self.filename)
+        file.unlink()
+
+    def rename(self, new_filename):
+        file = pathlib.Path(self.filename)
+        file.rename(new_filename)
+        self.filename = new_filename
+
+    def truncate(self):
+        with open(self.filename, "w") as f:
             f.write("")
 
     def read_page(self, page_index=0):
@@ -99,12 +113,15 @@ class IOManager:
             f.write(byte_data)
 
     def append_to_file(self, page: Page) -> int:
+
         byte_data = bytearray(data for record in page.records for data in bytes(record))
+
+        file_stats = pathlib.Path(self.filename).stat()
+        page_index = file_stats.st_size // self.chunk_size
+
         with open(self.filename, "a+b", buffering=self.chunk_size) as f:
             f.write(byte_data)
 
-        file_stats = pathlib.Path(self.filename).stat()
-        page_index = math.ceil(file_stats.st_size / self.chunk_size)
         return page_index
 
     def get_record_num(self) -> int:

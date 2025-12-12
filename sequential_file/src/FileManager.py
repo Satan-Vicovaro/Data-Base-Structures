@@ -1,9 +1,11 @@
 import bisect
 from enum import Enum
+import math
 from pathlib import PosixPath
 from re import finditer
+import re
 from typing import Self
-from config import CHUNK_SIZE, RECORD_SIZE, RECORDS_PER_CHUNK
+from config import ALPHA, CHUNK_SIZE, RECORD_SIZE, RECORDS_PER_CHUNK
 from src.Structs import Page, Record
 from src.IOManager import IOManager
 
@@ -25,6 +27,8 @@ class FileManager:
         self.cache_page: Page = Page([], 0, file_name)
         self.cache_page_known_values: dict[int, int] = {}  # [ Record.key, index ]
         self.all_pages_full = True
+        assert 0 < ALPHA <= 1, "alpha should be in range (0,1]"
+        self.alpha = ALPHA
 
     def show_file(self):
         for i, record in enumerate(self.io_manager.read_whole_file()):
@@ -43,13 +47,16 @@ class FileManager:
 
         # find place on page
         page = self.cache_page
-        page_size = len(page.records)
-
-        if page_size == 0:
+        if page.size() == 0:
             print("Page should not be empty")
             return PageFindStatus.EMPTY_FILE, Record(0, 0, 0)
 
-        index = bisect.bisect_right(page.records, record.key, key=lambda l: l.key) - 1
+        index = (
+            bisect.bisect_right(
+                page.records, record.key, hi=page.size(), key=lambda l: l.key
+            )
+            - 1
+        )
 
         if index == -1:
             print("Why index is -1, Aborting")
@@ -123,3 +130,49 @@ class FileManager:
 
     def get_page(self, page_index) -> Page:
         return self.io_manager.read_page(page_index)
+
+    def init_new_file(self):
+        self.new_file = IOManager(
+            Record,
+            "new_" + self.file_name,
+            chunk_size=CHUNK_SIZE,
+            record_size=RECORD_SIZE,
+        )
+        self.output_buffer: list[Record] = []
+
+    def aggreate_append_to_new_file(self, record: Record):
+        record.overflow_ptr = 0
+        self.output_buffer.append(record)
+        max_record_num = math.ceil(RECORDS_PER_CHUNK * self.alpha)
+        if len(self.output_buffer) >= max_record_num:
+
+            for _ in range(RECORDS_PER_CHUNK - max_record_num):
+                self.output_buffer.append(Record.empty_record())
+
+            page_index = self.new_file.append_to_file(Page(self.output_buffer, 0, ""))
+            smallest_key_on_page = self.output_buffer[0].key
+            self.output_buffer.clear()
+            return smallest_key_on_page, page_index
+
+        return None, None
+
+    def append_leftovers(self):
+
+        if len(self.output_buffer) > 0:
+            page_index = self.new_file.append_to_file(Page(self.output_buffer, 0, ""))
+
+            smallest_key_on_page = self.output_buffer[0].key
+            return smallest_key_on_page, page_index
+        return None, None
+
+    def switch_to_new_file(self):
+
+        proper_name = self.io_manager.filename
+        self.io_manager.delete()
+        self.io_manager = self.new_file
+        self.io_manager.rename(proper_name)
+        del self.new_file
+        del self.output_buffer
+
+    def truncate_file(self):
+        self.io_manager.truncate()

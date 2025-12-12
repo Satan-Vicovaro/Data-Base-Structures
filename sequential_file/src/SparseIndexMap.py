@@ -4,6 +4,7 @@ from src.FileManager import FileManager, PageFindStatus
 from src.Structs import Page, Record, SparseIndex
 from src.IOManager import IOManager
 from enum import Enum
+from copy import copy
 import bisect
 
 
@@ -160,7 +161,9 @@ class SparseIndexMap:
             next_page, next_record = self.overflow_file.get_page_and_record_from_ptr(
                 cur_record.overflow_ptr
             )
-            yield next_record, depth
+
+            if not next_record.is_empty():
+                yield next_record, depth
             depth += 1
             cur_record = next_record
 
@@ -168,9 +171,36 @@ class SparseIndexMap:
         page = self.main_file.get_page(page_index)
 
         for record in page.records:
-            yield record, 0
+            if not record.is_empty():
+                yield record, 0
             yield from self.iter_overflow(record)
 
     def iter_all(self):
         for sprase_index in self.sparseIndexes:
             yield from self.iter_page(sprase_index.page_index)
+
+    def get_record_num(self) -> int:
+        record_num_main = self.main_file.get_next_overflow_ptr() - 1
+        record_num_overflow = self.overflow_file.get_next_overflow_ptr() - 1
+        return record_num_main + record_num_overflow
+
+    def reorganize(self):
+        self.main_file.init_new_file()
+        new_spare_indexes: list[SparseIndex] = []
+        for record, _ in self.iter_all():
+
+            smallest_key_on_page, page_index = (
+                self.main_file.aggreate_append_to_new_file(copy(record))
+            )
+
+            if smallest_key_on_page is not None and page_index is not None:
+                new_spare_indexes.append(SparseIndex(smallest_key_on_page, page_index))
+
+        smallest_key_on_page, page_index = self.main_file.append_leftovers()
+
+        if smallest_key_on_page is not None and page_index is not None:
+            new_spare_indexes.append(SparseIndex(smallest_key_on_page, page_index))
+
+        self.sparseIndexes = new_spare_indexes
+        self.main_file.switch_to_new_file()
+        self.overflow_file.truncate_file()

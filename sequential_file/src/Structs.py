@@ -1,4 +1,5 @@
 import bisect
+from itertools import count
 import secrets
 import random
 import struct
@@ -88,21 +89,21 @@ class Record:
     @classmethod
     def empty_record(cls):
         key = 0
-        data = Data(str(b"\0" * RECORD_SIZE))
+        data = Data(str("CCCCCCCCCC"))
         overflow_ptr = 0
         return Record(key, data, overflow_ptr)
 
     def is_empty(self) -> bool:
         if (
             self.key == 0
-            and self.data.value == str(b"\0" * RECORD_SIZE)
+            and self.data.value == str("CCCCCCCCCC")
             and self.overflow_ptr == 0
         ):
             return True
         return False
 
     def is_deleted(self) -> bool:
-        if self.key != 0 and self.data.value == str(b"\0" * RECORD_SIZE):
+        if self.key != 0 and self.data.value == str("C" * RECORD_SIZE):
             return True
         return False
 
@@ -160,13 +161,21 @@ class Page:
             print("Value does not exist!!!")
 
     def exist(self, record):
-        if record in self.records:
-            return True
+        return any(rec.key == record.key for rec in self.records)
 
-        return False
+    def size(self):
+        elem_num = 0
+        for record in self.records:
+            if not record.is_empty():
+                elem_num += 1
+                continue
+            break
+        return elem_num
 
     def insert(self, record: Record):
-        index = bisect.bisect_right(self.records, record.key, key=lambda l: l.key)
+        index = bisect.bisect_right(
+            self.records, record.key, hi=self.size(), key=lambda l: l.key
+        )
         self.records.insert(index, record)
 
         if len(self.records) == RECORDS_PER_CHUNK + 1:
