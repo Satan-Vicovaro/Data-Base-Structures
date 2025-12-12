@@ -168,6 +168,15 @@ class Page:
         index = bisect.bisect_right(self.records, record.key, key=lambda l: l.key)
         self.records.insert(index, record)
 
-    def can_insert(self, record: Record) -> bool:
+        if len(self.records) == RECORDS_PER_CHUNK + 1:
+            self.records.pop()
 
-        pass
+    def can_insert(self) -> bool:
+        for record in self.records:
+            if record.is_empty():
+                return True
+
+        if len(self.records) < RECORDS_PER_CHUNK:
+            return True
+
+        return False
