@@ -37,7 +37,7 @@ class IOManager:
 
         # return raw_data
         data_list = [self.target_class.from_bytes(b) for b in raw_data]
-        return Page(data_list, page_index)
+        return Page(data_list, page_index, self.filename)
 
     def read_last_page(self):
         file_stats = pathlib.Path(self.filename).stat()
@@ -53,7 +53,7 @@ class IOManager:
 
         # return raw_data
         data_list = [self.target_class.from_bytes(b) for b in raw_data]
-        return Page(data_list, page_index)
+        return Page(data_list, page_index, self.filename)
 
     def get_last_page_index(self):
         file_stats = pathlib.Path(self.filename).stat()

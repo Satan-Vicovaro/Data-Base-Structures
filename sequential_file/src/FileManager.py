@@ -2,6 +2,7 @@ import bisect
 from enum import Enum
 from pathlib import PosixPath
 from re import finditer
+from typing import Self
 from config import CHUNK_SIZE, RECORD_SIZE, RECORDS_PER_CHUNK
 from src.Structs import Page, Record
 from src.IOManager import IOManager
@@ -21,7 +22,7 @@ class FileManager:
         self.io_manager = IOManager(
             Record, filename=file_name, chunk_size=CHUNK_SIZE, record_size=RECORD_SIZE
         )
-        self.cache_page: Page = Page([], 0)
+        self.cache_page: Page = Page([], 0, file_name)
         self.cache_page_known_values: dict[int, int] = {}  # [ Record.key, index ]
         self.all_pages_full = True
 
@@ -30,12 +31,12 @@ class FileManager:
             print(f"{i+1} : {record}")
 
     def add_to_new_page(self, record: Record):
-        page_num = self.io_manager.append_to_file(Page([record], 0))
+        page_num = self.io_manager.append_to_file(Page([record], 0, self.file_name))
         pass
 
     def initialize(self, record: Record):
         self.all_pages_full = True
-        self.io_manager.append_to_file(Page([record], 0))
+        self.io_manager.append_to_file(Page([record], 0, self.file_name))
 
     def find_on_page(self, record: Record, page_index: int):
         self.cache_page = self.io_manager.read_page(page_index)

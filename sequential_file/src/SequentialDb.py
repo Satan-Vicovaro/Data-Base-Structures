@@ -3,6 +3,7 @@ from src.Structs import Record
 from src.SparseIndexMap import FindPlaceStatus, SparseIndexMap
 from src.FileManager import FileManager, PageFindStatus
 import cmd
+from itertools import pairwise
 
 
 class SequentialDb(cmd.Cmd):
@@ -20,8 +21,13 @@ class SequentialDb(cmd.Cmd):
         self.sparse_index_map.proper_order_show()
 
     def do_gen(self, arg: str):
-        # self.main_file.generate_random_records(20)
-        pass
+        if arg == "":
+            return
+        key_num = int(arg)
+        for _ in range(0, key_num):
+            rand_record = Record.random_record()
+            print(f"genenerating:{rand_record}")
+            self.add_key(rand_record)
 
     def do_add_key(self, arg: str):
         key, data = arg.split(" ", maxsplit=2)
@@ -47,12 +53,14 @@ class SequentialDb(cmd.Cmd):
         self.add_key(Record(12, "12"))
         self.add_key(Record(16, "13"))
         self.add_key(Record(21, "21"))
+        self.check_proper_order()
 
     def do_t2(self, arg: str):
         self.add_key(Record(10, "10"))
         self.add_key(Record(20, "20"))
         for i in range(11, 20):
             self.add_key(Record(i, str(i)))
+        self.check_proper_order()
 
     def do_t3(self, arg: str):
         self.add_key(Record(10, "10"))
@@ -63,11 +71,40 @@ class SequentialDb(cmd.Cmd):
             self.add_key(Record(10 + i, str(10 + i)))
             self.add_key(Record(20 + i, str(20 + i)))
 
+        self.check_proper_order()
+
     def do_t4(self, arg: str):
         self.add_key(Record(10, "10"))
         self.add_key(Record(100, "20"))
         for i in range(11, 100):
             self.add_key(Record(i, str(i)))
+
+        self.check_proper_order()
+
+    def do_t5(self, arg: str):
+        self.add_key(Record(99, "99"))
+        self.add_key(Record(165, "165"))
+        self.add_key(Record(133, "133"))
+        self.add_key(Record(119, "119"))
+        self.add_key(Record(42, "42"))
+        self.add_key(Record(94, "94"))
+        self.add_key(Record(140, "140"))
+
+        self.check_proper_order()
+
+    def do_t6(self, arg: str):
+        self.add_key(Record(0, "0"))
+        for _ in range(0, int(arg)):
+            self.add_key(Record.random_record())
+
+        self.check_proper_order()
+
+    def do_t7(self, arg: str):
+        self.add_key(Record(10, "10"))
+        self.add_key(Record(20, "20"))
+        self.add_key(Record(15, "15"))
+        self.add_key(Record(12, "12"))
+        self.check_proper_order()
 
     def do_a(self, arg: str):
         self.add_key(Record())
@@ -82,6 +119,15 @@ class SequentialDb(cmd.Cmd):
 
     def iterate_over_all(self):
         print("todo: implement inerate over all")
+
+    def check_proper_order(self):
+        for (cur_record, _), (next_record, _) in pairwise(
+            self.sparse_index_map.iter_all()
+        ):
+            if cur_record.key > next_record.key:
+                print("Values are not sorted proprely!!")
+                return
+        print("With proper order pass")
 
     def start(self):
         try:

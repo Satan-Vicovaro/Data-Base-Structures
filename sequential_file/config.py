@@ -1,4 +1,4 @@
-RAND_KEY_SIZE = 4  # bytes
+RAND_KEY_SIZE = 1  # bytes
 DATA_SIZE = 10  # bytes
 OVERFLOW_PTR_SIZE = 4  # bytes
 PAGE_KEY_SIZE = 4  # bytes

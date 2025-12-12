@@ -126,13 +126,16 @@ class SparseIndexMap:
                 record_to_add.overflow_ptr = current_record.overflow_ptr
 
                 overflow_ptr_to_record_to_add = (
-                    self.overflow_file.io_manager.get_record_num()
+                    self.overflow_file.get_next_overflow_ptr()
                 )
                 current_record.overflow_ptr = overflow_ptr_to_record_to_add
 
                 current_page.update_record(current_record)
+                if current_page.location == self.overflow_file.file_name:
+                    self.overflow_file.write_updated_page(current_page)
+                else:
+                    self.main_file.write_updated_page(current_page)
 
-                self.overflow_file.write_updated_page(current_page)
                 self.overflow_file.append_to_end(record_to_add)
                 break
 

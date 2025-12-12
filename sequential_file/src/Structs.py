@@ -143,9 +143,10 @@ class SparseIndex:
 
 class Page:
 
-    def __init__(self, records: list[Record], page_index: int) -> None:
+    def __init__(self, records: list[Record], page_index: int, location: str) -> None:
         self.records = records
         self.page_index = page_index
+        self.location = location
 
     def update_record(self, record: Record):
         updated = False
