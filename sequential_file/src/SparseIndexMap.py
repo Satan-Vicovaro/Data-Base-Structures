@@ -94,7 +94,7 @@ class SparseIndexMap:
                 return
 
             if status == PageFindStatus.EMPTY_FILE:
-                print("LOL")
+                print("Error: I should not be here!")
                 return
 
     def iterate_overflow(
