@@ -123,3 +123,6 @@ class FileManager:
 
         next_overflow_ptr = self.io_manager.get_record_num()
         return next_overflow_ptr + 1
+
+    def get_page(self, page_index) -> Page:
+        return self.io_manager.read_page(page_index)

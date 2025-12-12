@@ -17,7 +17,7 @@ class SequentialDb(cmd.Cmd):
         self.sparse_index_map.show_file()
 
     def do_proper_show(self, arg: str):
-        self.iterate_over_all()
+        self.sparse_index_map.proper_order_show()
 
     def do_gen(self, arg: str):
         # self.main_file.generate_random_records(20)

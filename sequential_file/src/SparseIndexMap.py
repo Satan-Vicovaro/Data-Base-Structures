@@ -52,8 +52,10 @@ class SparseIndexMap:
         print("Overflow:")
         self.overflow_file.show_file()
 
-    def add_to_end(self, record: Record):
-        pass
+    def proper_order_show(self):
+        for record, depth in self.iter_all():
+            indent = " " * depth
+            print(f"{indent} {record}")
 
     def initialize(self, record: Record, main_file: FileManager):
         self.sparseIndexes.append(SparseIndex(record.key, 0))
@@ -86,7 +88,7 @@ class SparseIndexMap:
                 return
 
             if page_status == PageFindStatus.IN_OVERFLOW:
-                self.iterate_overflow(self.main_file.cache_page, closest_record, record)
+                self.add_overflow(self.main_file.cache_page, closest_record, record)
                 return
 
             if page_status == PageFindStatus.VALUE_EXIST:
@@ -97,11 +99,9 @@ class SparseIndexMap:
                 print("Error: I should not be here!")
                 return
 
-    def iterate_overflow(
+    def add_overflow(
         self, current_page: Page, current_record: Record, record_to_add: Record
     ):
-        found_place = False
-
         while True:
             if current_record.overflow_ptr == 0:
 
@@ -149,3 +149,25 @@ class SparseIndexMap:
 
             current_page = next_page
             current_record = next_record
+
+    def iter_overflow(self, record: Record):
+        cur_record = record
+        depth = 1
+        while cur_record.overflow_ptr != 0:
+            next_page, next_record = self.overflow_file.get_page_and_record_from_ptr(
+                cur_record.overflow_ptr
+            )
+            yield next_record, depth
+            depth += 1
+            cur_record = next_record
+
+    def iter_page(self, page_index: int):
+        page = self.main_file.get_page(page_index)
+
+        for record in page.records:
+            yield record, 0
+            yield from self.iter_overflow(record)
+
+    def iter_all(self):
+        for sprase_index in self.sparseIndexes:
+            yield from self.iter_page(sprase_index.page_index)
