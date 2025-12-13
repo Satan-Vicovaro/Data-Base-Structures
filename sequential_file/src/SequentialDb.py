@@ -49,6 +49,18 @@ class SequentialDb(cmd.Cmd):
         else:
             print("Could not delete")
 
+    def do_update(self, arg: str):
+        key, value = arg.split(" ", maxsplit=2)
+        self.sparse_index_map.update_record(Record(int(key), value))
+        # self.sparse_index_map
+
+    def do_find(self, arg: str):
+        record = self.sparse_index_map.find_record(int(arg))
+        if record is None:
+            print("Value does not exist")
+            return
+        print(f"Found: {record}")
+
     def do_t1(self, arg: str):
         self.add_key(Record(5, "5"))
         self.add_key(Record(10, "10"))
@@ -149,13 +161,6 @@ class SequentialDb(cmd.Cmd):
         if self.sparse_index_map.should_reorganize():
             print("Automatic reorganisation")
             self.do_reorganize("")
-
-    def do_find(self, arg: str):
-        record = self.sparse_index_map.find_record(int(arg))
-        if record is None:
-            print("Value does not exist")
-            return
-        print(f"Found: {record}")
 
     def check_proper_order(self):
         for (cur_record, _), (next_record, _) in pairwise(

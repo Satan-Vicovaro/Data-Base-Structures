@@ -1,6 +1,3 @@
-from os import path
-import pathlib
-import re
 from config import INDEX_SIZE, REORGANIZATION_TRESHOLD, SPARSE_INDEX_CHUNK_SIZE
 from src.FileManager import FileManager, PageFindStatus
 from src.Structs import Page, Record, SparseIndex
@@ -65,6 +62,31 @@ class SparseIndexMap:
     def initialize(self, record: Record, main_file: FileManager):
         self.sparseIndexes.append(SparseIndex(record.key, 0))
         main_file.initialize(record)
+
+    def update_record(self, record: Record):
+        status, place = self.find_place(record.key)
+
+        if status != FindPlaceStatus.IN_MIDDLE and status != FindPlaceStatus.KEY_EXSITS:
+            print("Can not update value")
+            return
+
+        page_status, closest_record = self.main_file.find_on_page(
+            record, place.page_index
+        )
+
+        if page_status == PageFindStatus.VALUE_EXIST:
+            self.main_file.update_record(record)
+            return
+
+        if page_status == PageFindStatus.IN_OVERFLOW:
+            for overflow_val, _ in self.iter_overflow(closest_record):
+                if overflow_val.key != record.key:
+                    continue
+                if closest_record.is_empty():
+                    return False
+
+                overflow_val.data = record.data
+                self.overflow_file.update_record_overflow(overflow_val)
 
     def __handle_smaller_insert(self, record: Record, place: SparseIndex):
         page = self.main_file.get_page(place.page_index)
@@ -140,6 +162,7 @@ class SparseIndexMap:
             if closest_record.is_deleted():
                 return None
             return closest_record
+
         if page_status == PageFindStatus.IN_OVERFLOW:
             for overflow_val, _ in self.iter_overflow(closest_record):
                 if overflow_val.key != key:
