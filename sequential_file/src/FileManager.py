@@ -103,6 +103,14 @@ class FileManager:
         self.cache_page.records[index] = record
         self.io_manager.write_page(self.cache_page)
 
+    def update_record_overflow(self, record: Record):
+        if not self.cache_page.exist(record):
+            print("could not locate record")
+            return
+
+        self.cache_page.update_record(record)
+        self.io_manager.write_page(self.cache_page)
+
     def page_iter(self):
         yield self.io_manager.read_whole_file()
 

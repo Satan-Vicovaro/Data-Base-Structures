@@ -56,6 +56,8 @@ class SparseIndexMap:
 
     def proper_order_show(self):
         for record, depth in self.iter_all():
+            if record.is_empty() or record.is_deleted():
+                continue
             indent = " " * depth
             print(f"{indent} {record}")
 
@@ -114,12 +116,64 @@ class SparseIndexMap:
         )
 
         if page_status == PageFindStatus.VALUE_EXIST:
+            if closest_record.is_empty():
+                return None
+            if closest_record.is_deleted():
+                return None
             return closest_record
         if page_status == PageFindStatus.IN_OVERFLOW:
-            for overflow_val, depth in self.iter_overflow(closest_record):
-                if overflow_val.key == key:
-                    return overflow_val
+            for overflow_val, _ in self.iter_overflow(closest_record):
+                if overflow_val.key != key:
+                    continue
+
+                if closest_record.is_empty():
+                    return None
+                if closest_record.is_deleted():
+                    return None
+                return overflow_val
         return None
+
+    def delete_record(self, key: int) -> bool:
+        map_status, sparse_index = self.find_place(key)
+
+        if map_status == FindPlaceStatus.FILE_IS_EMPTY:
+            return False
+        if map_status == FindPlaceStatus.SMALLEST_IN_FILE:
+            return False
+
+        page_status, closest_record = self.main_file.find_on_page(
+            Record(key, "", 0), sparse_index.page_index
+        )
+
+        if page_status == PageFindStatus.VALUE_EXIST:
+            if closest_record.is_deleted():
+                print("Value already deleted")
+                return False
+
+            if closest_record.is_empty():
+                return False
+
+            closest_record.mark_as_deleted()
+            self.main_file.update_record(closest_record)
+            return True
+
+        if page_status == PageFindStatus.IN_OVERFLOW:
+            for overflow_val, _ in self.iter_overflow(closest_record):
+                if overflow_val.key != key:
+                    continue
+
+                if closest_record.is_deleted():
+                    print("Value already deleted")
+                    return False
+
+                if closest_record.is_empty():
+                    return False
+
+                overflow_val.mark_as_deleted()
+                self.overflow_file.update_record_overflow(overflow_val)
+                return True
+
+        return False
 
     def add_overflow(
         self, current_page: Page, current_record: Record, record_to_add: Record
@@ -183,8 +237,7 @@ class SparseIndexMap:
                 cur_record.overflow_ptr
             )
 
-            if not next_record.is_empty():
-                yield next_record, depth
+            yield next_record, depth
             depth += 1
             cur_record = next_record
 
@@ -192,8 +245,7 @@ class SparseIndexMap:
         page = self.main_file.get_page(page_index)
 
         for record in page.records:
-            if not record.is_empty():
-                yield record, 0
+            yield record, 0
             yield from self.iter_overflow(record)
 
     def iter_all(self):
@@ -209,6 +261,8 @@ class SparseIndexMap:
         self.main_file.init_new_file()
         new_spare_indexes: list[SparseIndex] = []
         for record, _ in self.iter_all():
+            if record.is_empty() or record.is_deleted():
+                continue
 
             smallest_key_on_page, page_index = (
                 self.main_file.aggreate_append_to_new_file(copy(record))

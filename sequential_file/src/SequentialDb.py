@@ -32,7 +32,7 @@ class SequentialDb(cmd.Cmd):
 
     def do_add_key(self, arg: str):
         key, data = arg.split(" ", maxsplit=2)
-        self.add_key(Record(int(key), data))
+        self.add_key(Record(int(key), str(data)))
 
     def do_help(self, arg: str) -> bool | None:
         return super().do_help(arg)
@@ -41,6 +41,13 @@ class SequentialDb(cmd.Cmd):
         "Quits program"
         print("bye")
         return True
+
+    def do_delete(self, arg: str):
+        result = self.sparse_index_map.delete_record(int(arg))
+        if result:
+            print("Succesfully deleted")
+        else:
+            print("Could not delete")
 
     def do_t1(self, arg: str):
         self.add_key(Record(5, "5"))
@@ -118,6 +125,13 @@ class SequentialDb(cmd.Cmd):
         self.do_reorganize("")
         self.check_proper_order()
 
+    def do_t9(self, arg: str):
+        for i in range(0, 30, 5):
+            self.add_key(Record(i, str(i)))
+        self.add_key(Record(6, "6"))
+        self.add_key(Record(7, "6"))
+        self.add_key(Record(8, "6"))
+
     def do_a(self, arg: str):
         self.add_key(Record.random_record())
 
@@ -143,6 +157,10 @@ class SequentialDb(cmd.Cmd):
         for (cur_record, _), (next_record, _) in pairwise(
             self.sparse_index_map.iter_all()
         ):
+            if cur_record.is_empty():
+                continue
+            if next_record.is_empty():
+                continue
             if cur_record.key >= next_record.key:
                 print("Values are not sorted proprely!!")
                 return

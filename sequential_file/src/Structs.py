@@ -23,6 +23,8 @@ class Data:
     record_size = DATA_SIZE
 
     def __init__(self, value: str = "CCCCCCCCCC") -> None:
+        if isinstance(value, int):
+            value = str(value)
         self.value = value[: self.record_size].ljust(self.record_size, "C")
 
     @classmethod
@@ -102,8 +104,11 @@ class Record:
             return True
         return False
 
+    def mark_as_deleted(self):
+        self.data.value = str("CCCCCCCCCC")
+
     def is_deleted(self) -> bool:
-        if self.key != 0 and self.data.value == str("C" * RECORD_SIZE):
+        if self.key != 0 and self.data.value == str("CCCCCCCCCC"):
             return True
         return False
 
