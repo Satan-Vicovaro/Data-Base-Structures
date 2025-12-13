@@ -1,6 +1,7 @@
+from os import path
 import pathlib
 import re
-from config import INDEX_SIZE, SPARSE_INDEX_CHUNK_SIZE
+from config import INDEX_SIZE, REORGANIZATION_TRESHOLD, SPARSE_INDEX_CHUNK_SIZE
 from src.FileManager import FileManager, PageFindStatus
 from src.Structs import Page, Record, SparseIndex
 from src.IOManager import IOManager
@@ -40,7 +41,7 @@ class SparseIndexMap:
         place = self.sparseIndexes[index]
 
         if index == -1:
-            return (FindPlaceStatus.SMALLEST_IN_FILE, place)
+            return (FindPlaceStatus.SMALLEST_IN_FILE, self.sparseIndexes[0])
 
         if place.key == key:
             return (FindPlaceStatus.KEY_EXSITS, place)
@@ -65,6 +66,25 @@ class SparseIndexMap:
         self.sparseIndexes.append(SparseIndex(record.key, 0))
         main_file.initialize(record)
 
+    def __handle_smaller_insert(self, record: Record, place: SparseIndex):
+        page = self.main_file.get_page(place.page_index)
+        # is there free space on page
+        if page.can_insert():
+            self.sparseIndexes[0].key = record.key
+            page.insert(record)
+            self.main_file.write_updated_page(page)
+            return
+
+        self.sparseIndexes[0].key = record.key
+        record.overflow_ptr = self.overflow_file.get_next_overflow_ptr()
+
+        page = self.main_file.get_page(place.page_index)
+        old_page_smallest = page.records[0]
+        page.records[0] = record
+
+        self.main_file.write_updated_page(page)
+        self.overflow_file.append_to_end(old_page_smallest)
+
     def add_key(self, record: Record):
         status, place = self.find_place(record.key)
 
@@ -75,17 +95,12 @@ class SparseIndexMap:
             print("Key exsists, aborting")
             return
         if status == FindPlaceStatus.SMALLEST_IN_FILE:
-            print("Handle smallest in the file")
-            return
+            self.__handle_smaller_insert(record, place)
 
         if status == FindPlaceStatus.IN_MIDDLE:
             page_status, closest_record = self.main_file.find_on_page(
                 record, place.page_index
             )
-
-            if page_status == PageFindStatus.FILE_IS_FULL:
-                print("Create new page and add key there")
-                return
 
             if page_status == PageFindStatus.FREE_SPACE_TO_APPEND:
                 self.main_file.append_to_current(record, place.page_index)
@@ -94,6 +109,10 @@ class SparseIndexMap:
             if page_status == PageFindStatus.IN_OVERFLOW:
                 self.add_overflow(self.main_file.cache_page, closest_record, record)
                 return
+
+            if page_status == PageFindStatus.IS_DELETED:
+                closest_record.data = record.data
+                self.main_file.write_updated_page(self.main_file.cache_page)
 
             if page_status == PageFindStatus.VALUE_EXIST:
                 print("Value exsits, aborting")
@@ -256,6 +275,12 @@ class SparseIndexMap:
         record_num_main = self.main_file.get_next_overflow_ptr() - 1
         record_num_overflow = self.overflow_file.get_next_overflow_ptr() - 1
         return record_num_main + record_num_overflow
+
+    def should_reorganize(self) -> bool:
+        main_file_size = self.main_file.get_next_overflow_ptr() - 1
+        of_file_size = self.overflow_file.get_next_overflow_ptr() - 1
+
+        return of_file_size / main_file_size > REORGANIZATION_TRESHOLD
 
     def reorganize(self):
         self.main_file.init_new_file()

@@ -146,6 +146,10 @@ class SequentialDb(cmd.Cmd):
     def add_key(self, record: Record):
         self.sparse_index_map.add_key(record)
 
+        if self.sparse_index_map.should_reorganize():
+            print("Automatic reorganisation")
+            self.do_reorganize("")
+
     def do_find(self, arg: str):
         record = self.sparse_index_map.find_record(int(arg))
         if record is None:

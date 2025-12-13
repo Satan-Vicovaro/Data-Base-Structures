@@ -165,8 +165,21 @@ class Page:
         if not updated:
             print("Value does not exist!!!")
 
-    def exist(self, record):
+    def exist(self, record: Record):
         return any(rec.key == record.key for rec in self.records)
+
+    def exist_and_not_valid(self, record: Record):
+        for rec in self.records:
+            if rec.key != record.key:
+                continue
+
+            if rec.is_deleted():
+                return True
+            if rec.is_empty():
+                return True
+            return False
+
+        return False
 
     def size(self):
         elem_num = 0

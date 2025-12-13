@@ -16,6 +16,7 @@ class PageFindStatus(Enum):
     FREE_SPACE_TO_APPEND = 2
     EMPTY_FILE = 3
     FILE_IS_FULL = 4
+    IS_DELETED = 5
 
 
 class FileManager:
@@ -63,6 +64,9 @@ class FileManager:
             return PageFindStatus.EMPTY_FILE, Record(0, 0, 0)
 
         closest_record = page.records[index]
+
+        if page.exist_and_not_valid(record):
+            return PageFindStatus.IS_DELETED, closest_record
 
         if page.exist(record):
             return PageFindStatus.VALUE_EXIST, closest_record
