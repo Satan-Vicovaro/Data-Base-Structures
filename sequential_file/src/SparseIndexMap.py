@@ -1,4 +1,9 @@
-from config import INDEX_SIZE, REORGANIZATION_TRESHOLD, SPARSE_INDEX_CHUNK_SIZE
+from config import (
+    INDEX_SIZE,
+    INDEXES_PER_CHUNK,
+    REORGANIZATION_TRESHOLD,
+    SPARSE_INDEX_CHUNK_SIZE,
+)
 from src.FileManager import FileManager, PageFindStatus
 from src.Structs import Page, Record, SparseIndex
 from src.IOManager import IOManager
@@ -68,7 +73,7 @@ class SparseIndexMap:
 
         if status != FindPlaceStatus.IN_MIDDLE and status != FindPlaceStatus.KEY_EXSITS:
             print("Can not update value")
-            return
+            return False
 
         page_status, closest_record = self.main_file.find_on_page(
             record, place.page_index
@@ -76,8 +81,7 @@ class SparseIndexMap:
 
         if page_status == PageFindStatus.VALUE_EXIST:
             self.main_file.update_record(record)
-            return
-
+            return True
         if page_status == PageFindStatus.IN_OVERFLOW:
             for overflow_val, _ in self.iter_overflow(closest_record):
                 if overflow_val.key != record.key:
@@ -87,10 +91,12 @@ class SparseIndexMap:
 
                 overflow_val.data = record.data
                 self.overflow_file.update_record_overflow(overflow_val)
+                return True
+        return False
 
     def __handle_smaller_insert(self, record: Record, place: SparseIndex):
         page = self.main_file.get_page(place.page_index)
-        # is there free space on page
+
         if page.can_insert():
             self.sparseIndexes[0].key = record.key
             page.insert(record)
@@ -275,7 +281,7 @@ class SparseIndexMap:
         cur_record = record
         depth = 1
         while cur_record.overflow_ptr != 0:
-            next_page, next_record = self.overflow_file.get_page_and_record_from_ptr(
+            _, next_record = self.overflow_file.get_page_and_record_from_ptr(
                 cur_record.overflow_ptr
             )
 
@@ -308,6 +314,8 @@ class SparseIndexMap:
     def reorganize(self):
         self.main_file.init_new_file()
         new_spare_indexes: list[SparseIndex] = []
+        self.io_manager.truncate()
+
         for record, _ in self.iter_all():
             if record.is_empty() or record.is_deleted():
                 continue
@@ -319,11 +327,16 @@ class SparseIndexMap:
             if smallest_key_on_page is not None and page_index is not None:
                 new_spare_indexes.append(SparseIndex(smallest_key_on_page, page_index))
 
+                if len(new_spare_indexes) > INDEXES_PER_CHUNK:
+                    self.io_manager.append_chunk_to_file(new_spare_indexes)
+                    new_spare_indexes.clear()
+
         smallest_key_on_page, page_index = self.main_file.append_leftovers()
 
         if smallest_key_on_page is not None and page_index is not None:
             new_spare_indexes.append(SparseIndex(smallest_key_on_page, page_index))
+            self.io_manager.append_chunk_to_file(new_spare_indexes)
 
-        self.sparseIndexes = new_spare_indexes
         self.main_file.switch_to_new_file()
         self.overflow_file.truncate_file()
+        self.sparseIndexes = list(self.io_manager.read_whole_file())

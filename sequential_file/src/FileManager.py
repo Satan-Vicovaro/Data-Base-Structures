@@ -4,7 +4,7 @@ import math
 from pathlib import PosixPath
 from re import finditer
 import re
-from typing import Self
+from typing import IO, Self
 from config import ALPHA, CHUNK_SIZE, RECORD_SIZE, RECORDS_PER_CHUNK
 from src.Structs import Page, Record
 from src.IOManager import IOManager

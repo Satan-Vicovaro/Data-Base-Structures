@@ -22,7 +22,7 @@ def random_key_gen() -> int:
 class Data:
     record_size = DATA_SIZE
 
-    def __init__(self, value: str = "CCCCCCCCCC") -> None:
+    def __init__(self, value: str = "C" * DATA_SIZE) -> None:
         if isinstance(value, int):
             value = str(value)
         self.value = value[: self.record_size].ljust(self.record_size, "C")
@@ -91,24 +91,24 @@ class Record:
     @classmethod
     def empty_record(cls):
         key = 0
-        data = Data(str("CCCCCCCCCC"))
+        data = Data("C" * DATA_SIZE)
         overflow_ptr = 0
         return Record(key, data, overflow_ptr)
 
     def is_empty(self) -> bool:
         if (
             self.key == 0
-            and self.data.value == str("CCCCCCCCCC")
+            and self.data.value == "C" * DATA_SIZE
             and self.overflow_ptr == 0
         ):
             return True
         return False
 
     def mark_as_deleted(self):
-        self.data.value = str("CCCCCCCCCC")
+        self.data.value = "C" * DATA_SIZE
 
     def is_deleted(self) -> bool:
-        if self.key != 0 and self.data.value == str("CCCCCCCCCC"):
+        if self.key != 0 and self.data.value == "C" * DATA_SIZE:
             return True
         return False
 
@@ -136,8 +136,8 @@ class SparseIndex:
         fmt = f"{RAND_KEY_SIZE}s{PAGE_KEY_SIZE}s"
         return struct.pack(
             fmt,
-            int.to_bytes(self.key, byteorder="little"),
-            int.to_bytes(self.page_index, byteorder="little"),
+            self.key.to_bytes(RAND_KEY_SIZE, byteorder="little"),
+            self.page_index.to_bytes(PAGE_KEY_SIZE, byteorder="little"),
         )
 
     def __str__(self) -> str:
@@ -208,3 +208,13 @@ class Page:
             return True
 
         return False
+
+
+class SparseIndexPage:
+
+    def __init__(
+        self, indexes: list[SparseIndex], page_index: int, location: str
+    ) -> None:
+        self.indexes = indexes
+        self.page_index = page_index
+        self.location = location
