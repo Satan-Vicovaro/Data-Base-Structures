@@ -243,7 +243,9 @@ class SparseIndexMap:
             )
 
             if next_record.key == record_to_add.key:
-                print("Value exsits aborting")
+                if next_record.is_deleted():
+                    next_record.data = record_to_add.data
+                    self.overflow_file.write_updated_page(next_page)
                 break
 
             if next_record.key > record_to_add.key:
