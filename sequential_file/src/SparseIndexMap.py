@@ -335,7 +335,10 @@ class SparseIndexMap:
 
         if smallest_key_on_page is not None and page_index is not None:
             new_spare_indexes.append(SparseIndex(smallest_key_on_page, page_index))
+
+        if len(new_spare_indexes) > 0:
             self.io_manager.append_chunk_to_file(new_spare_indexes)
+            new_spare_indexes.clear()
 
         self.main_file.switch_to_new_file()
         self.overflow_file.truncate_file()

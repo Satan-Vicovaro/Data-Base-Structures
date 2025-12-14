@@ -35,16 +35,16 @@ class FileManager:
         for i, record in enumerate(self.io_manager.read_whole_file()):
             print(f"{i+1} : {record}")
 
-    def add_to_new_page(self, record: Record):
-        page_num = self.io_manager.append_to_file(Page([record], 0, self.file_name))
-        pass
-
     def initialize(self, record: Record):
         self.all_pages_full = True
         self.io_manager.append_to_file(Page([record], 0, self.file_name))
+        self.cache_page = self.io_manager.read_page(0)
 
     def find_on_page(self, record: Record, page_index: int):
-        self.cache_page = self.io_manager.read_page(page_index)
+
+        if self.cache_page.page_index != page_index:
+            # cache miss
+            self.cache_page = self.io_manager.read_page(page_index)
 
         # find place on page
         page = self.cache_page
@@ -77,10 +77,9 @@ class FileManager:
         return PageFindStatus.IN_OVERFLOW, closest_record
 
     def append_to_current(self, record: Record, page_index: int):
-        self.all_pages_full = False
         if page_index != self.cache_page.page_index:
-            print("Why are you NOT inserting to the same page? Aborting")
-            return
+            print("Why are you NOT inserting to the same page? Cache miss")
+            self.cache_page = self.io_manager.read_page(page_index)
 
         self.cache_page.insert(record)
         self.io_manager.write_page(self.cache_page)
@@ -91,6 +90,7 @@ class FileManager:
         page = self.io_manager.read_last_page()
         page.records.append(record)
 
+        self.cache_page = page
         self.io_manager.write_last_page(page)
         return record_number + 1
 
@@ -125,7 +125,8 @@ class FileManager:
 
         overflow_ptr -= 1
         page_index = overflow_ptr // RECORDS_PER_CHUNK
-        self.cache_page = self.io_manager.read_page(page_index)
+        if page_index != self.cache_page.page_index:
+            self.cache_page = self.io_manager.read_page(page_index)
 
         record_index = overflow_ptr % RECORDS_PER_CHUNK
         record = self.cache_page.records[record_index]
@@ -133,15 +134,17 @@ class FileManager:
         return self.cache_page, record
 
     def write_updated_page(self, page: Page):
+        self.cache_page = page
         self.io_manager.write_page(page)
 
     def get_next_overflow_ptr(self):
-
         next_overflow_ptr = self.io_manager.get_record_num()
         return next_overflow_ptr + 1
 
     def get_page(self, page_index) -> Page:
-        return self.io_manager.read_page(page_index)
+        if self.cache_page.page_index != page_index:
+            self.cache_page = self.io_manager.read_page(page_index)
+        return self.cache_page
 
     def init_new_file(self):
         self.new_file = IOManager(
@@ -169,7 +172,6 @@ class FileManager:
         return None, None
 
     def append_leftovers(self):
-
         if len(self.output_buffer) > 0:
             page_index = self.new_file.append_to_file(Page(self.output_buffer, 0, ""))
 
