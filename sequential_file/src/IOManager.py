@@ -1,4 +1,5 @@
 from functools import cached_property
+import logging
 from os import set_blocking
 import pathlib
 import math
@@ -149,6 +150,6 @@ class IOManager:
         path = pathlib.Path(self.filename)
         file_size = path.stat().st_size
         if file_size % self.record_size != 0:
-            print("There is error on page layout")
+            logging.debug("There is error on page layout")
             return 1
         return file_size // self.record_size

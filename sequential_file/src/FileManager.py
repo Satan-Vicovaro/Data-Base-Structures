@@ -1,5 +1,6 @@
 import bisect
 from enum import Enum
+import logging
 import math
 from pathlib import PosixPath
 from re import finditer
@@ -33,7 +34,7 @@ class FileManager:
 
     def show_file(self):
         for i, record in enumerate(self.io_manager.read_whole_file()):
-            print(f"{i+1} : {record}")
+            logging.info(f"{i+1} : {record}")
 
     def initialize(self, record: Record):
         self.all_pages_full = True
@@ -49,7 +50,7 @@ class FileManager:
         # find place on page
         page = self.cache_page
         if page.size() == 0:
-            print("Page should not be empty")
+            logging.debug("Page should not be empty")
             return PageFindStatus.EMPTY_FILE, Record(0, 0, 0)
 
         index = (
@@ -60,7 +61,7 @@ class FileManager:
         )
 
         if index == -1:
-            print("Why index is -1, Aborting")
+            logging.debug("Why index is -1, Aborting")
             return PageFindStatus.EMPTY_FILE, Record(0, 0, 0)
 
         closest_record = page.records[index]
@@ -78,7 +79,7 @@ class FileManager:
 
     def append_to_current(self, record: Record, page_index: int):
         if page_index != self.cache_page.page_index:
-            print("Why are you NOT inserting to the same page? Cache miss")
+            logging.debug("Why are you NOT inserting to the same page? Cache miss")
             self.cache_page = self.io_manager.read_page(page_index)
 
         self.cache_page.insert(record)
@@ -102,14 +103,14 @@ class FileManager:
             - 1
         )
         if record.key != self.cache_page.records[index].key:
-            print("Upadte record could not locate record")
+            logging.debug("Upadte record could not locate record")
             return
         self.cache_page.records[index] = record
         self.io_manager.write_page(self.cache_page)
 
     def update_record_overflow(self, record: Record):
         if not self.cache_page.exist(record):
-            print("could not locate record")
+            logging.debug("could not locate record")
             return
 
         self.cache_page.update_record(record)
@@ -120,7 +121,7 @@ class FileManager:
 
     def get_page_and_record_from_ptr(self, overflow_ptr: int):
         if overflow_ptr == 0:
-            print("Wrong overflow ptr")
+            logging.debug("Wrong overflow ptr")
             return self.cache_page, Record.empty_record()
 
         overflow_ptr -= 1
@@ -130,7 +131,7 @@ class FileManager:
             self.cache_page = self.io_manager.read_page(page_index)
 
         if self.cache_page.size() == 0:
-            print("Error: cache is empty")
+            logging.debug("Error: cache is empty")
             return self.cache_page, Record.empty_record()
 
         record_index = overflow_ptr % RECORDS_PER_CHUNK

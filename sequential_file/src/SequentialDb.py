@@ -1,24 +1,33 @@
 import pathlib
+import random
 import re
+import config
 from src.IOManager import IOManager
 from src.Structs import Record
 from src.SparseIndexMap import FindPlaceStatus, SparseIndexMap
 from src.FileManager import FileManager, PageFindStatus
 import cmd
 from itertools import pairwise
+import time
+
+import logging
 
 
 def count_io_operations(func):
     def wrapper(*args, **kwargs):
+        time_before = time.time()
         read_count_before = IOManager.total_read_count
         write_count_before = IOManager.total_write_count
+
         result = func(*args, **kwargs)
 
+        time_after = time.time()
         read_count_after = IOManager.total_read_count
         write_count_after = IOManager.total_write_count
 
-        print(f"Reads: {read_count_after - read_count_before}")
-        print(f"Writes: {write_count_after - write_count_before}")
+        logging.info(f"Reads: {read_count_after - read_count_before}")
+        logging.info(f"Writes: {write_count_after - write_count_before}")
+        logging.info(f"Time: {time_after - time_before}")
 
         return result
 
@@ -31,6 +40,9 @@ class SequentialDb(cmd.Cmd):
 
     def __init__(self) -> None:
         super().__init__()
+        self.sparse_index_map = SparseIndexMap()
+
+    def reinit(self) -> None:
         self.sparse_index_map = SparseIndexMap()
 
     def do_show(self, arg: str):
@@ -46,7 +58,7 @@ class SequentialDb(cmd.Cmd):
         key_num = int(arg)
         for _ in range(0, key_num):
             rand_record = Record.random_record()
-            print(f"genenerating:{rand_record}")
+            logging.debug(f"genenerating:{rand_record}")
             self.add_key(rand_record)
 
     @count_io_operations
@@ -59,16 +71,16 @@ class SequentialDb(cmd.Cmd):
 
     def do_quit(self, arg: str):
         "Quits program"
-        print("bye")
+        logging.debug("bye")
         return True
 
     @count_io_operations
     def do_delete(self, arg: str):
         result = self.sparse_index_map.delete_record(int(arg))
         if result:
-            print("Succesfully deleted")
+            logging.debug("Succesfully deleted")
         else:
-            print("Could not delete")
+            logging.debug("Could not delete")
 
     @count_io_operations
     def do_update(self, arg: str):
@@ -80,94 +92,65 @@ class SequentialDb(cmd.Cmd):
     def do_find(self, arg: str):
         record = self.sparse_index_map.find_record(int(arg))
         if record is None:
-            print("Value does not exist")
+            logging.debug("Value does not exist")
             return
-        print(f"Found: {record}")
+        logging.debug(f"Found: {record}")
 
-    def do_t1(self, arg: str):
-        self.add_key(Record(5, "5"))
-        self.add_key(Record(10, "10"))
-        self.add_key(Record(15, "15"))
-        self.add_key(Record(20, "20"))
-        self.add_key(Record(30, "30"))
-        self.add_key(Record(6, "6"))
-        self.add_key(Record(7, "7"))
-        self.add_key(Record(11, "11"))
-        self.add_key(Record(12, "12"))
-        self.add_key(Record(16, "13"))
-        self.add_key(Record(21, "21"))
-        self.check_proper_order()
+    @count_io_operations
+    def do_test_add_records(self, arg: str):
+        if arg == "":
+            record_num = 10
+        else:
+            record_num = int(arg)
 
-    def do_t2(self, arg: str):
-        self.add_key(Record(10, "10"))
-        self.add_key(Record(20, "20"))
-        for i in range(11, 20):
-            self.add_key(Record(i, str(i)))
-        self.check_proper_order()
-
-    def do_t3(self, arg: str):
-        self.add_key(Record(10, "10"))
-        self.add_key(Record(20, "20"))
-        self.add_key(Record(30, "30"))
-
-        for i in range(1, 6):
-            self.add_key(Record(10 + i, str(10 + i)))
-            self.add_key(Record(20 + i, str(20 + i)))
-
-        self.check_proper_order()
-
-    def do_t4(self, arg: str):
-        self.add_key(Record(10, "10"))
-        self.add_key(Record(100, "20"))
-        for i in range(11, 100):
+        for i in range(0, record_num):
             self.add_key(Record(i, str(i)))
 
+        self.do_show("")
         self.check_proper_order()
 
-    def do_t5(self, arg: str):
-        self.add_key(Record(99, "99"))
-        self.add_key(Record(165, "165"))
-        self.add_key(Record(133, "133"))
-        self.add_key(Record(119, "119"))
-        self.add_key(Record(42, "42"))
-        self.add_key(Record(94, "94"))
-        self.add_key(Record(140, "140"))
+    @count_io_operations
+    def do_test_random_adds_and_deletions(self, arg: str):
 
-        self.check_proper_order()
+        if arg == "":
+            record_num = 10
+        else:
+            record_num = int(arg)
 
-    def do_t6(self, arg: str = "10"):
-        self.add_key(Record(0, "0"))
-        for _ in range(0, int(arg)):
-            self.add_key(Record.random_record())
+        for _ in range(record_num):
+            mode = random.randint(0, 2)
+            added_keys = {}
+            if mode == 0:
+                if len(added_keys) == 0:
+                    continue
+                delete_record_key = random.choice(list(added_keys.keys()))
+                self.sparse_index_map.delete_record(delete_record_key)
+            else:
+                rand_record = Record.random_record()
+                added_keys[rand_record.key] = rand_record
+                self.add_key(rand_record)
 
-        self.check_proper_order()
+    @count_io_operations
+    def do_test_add_and_delete_all_record(self, arg: str):
 
-    def do_t7(self, arg: str):
-        self.add_key(Record(10, "10"))
-        self.add_key(Record(20, "20"))
-        self.add_key(Record(15, "15"))
-        self.add_key(Record(12, "12"))
-        self.check_proper_order()
+        if arg == "":
+            record_num = 30
+        else:
+            record_num = int(arg)
 
-    def do_t8(self, arg: str):
-        self.add_key(Record(0, "0"))
-        for _ in range(50):
-            self.add_key(Record.random_record())
-        self.do_reorganize("")
-        for _ in range(50):
-            self.add_key(Record.random_record())
-        self.check_proper_order()
-        self.do_reorganize("")
-        self.check_proper_order()
+        key_added = {}
 
-    def do_t9(self, arg: str):
-        for i in range(0, 30, 5):
-            self.add_key(Record(i, str(i)))
-        self.add_key(Record(6, "6"))
-        self.add_key(Record(7, "6"))
-        self.add_key(Record(8, "6"))
+        for _ in range(record_num):
+            rand_record = Record.random_record()
+            key_added[rand_record.key] = rand_record
+            self.add_key(rand_record)
+        for key in key_added.keys():
+            self.sparse_index_map.delete_record(key)
 
-    def do_a(self, arg: str):
+        self.do_show("")
+        self.do_proper_show("")
+
+    def do_ar(self, arg: str):
         self.add_key(Record.random_record())
 
     def do_reorganize(self, arg: str):
@@ -175,14 +158,14 @@ class SequentialDb(cmd.Cmd):
 
     def do_q(self, arg: str):
         "Quits program"
-        print("bye")
+        logging.debug("bye")
         return True
 
     def add_key(self, record: Record):
         self.sparse_index_map.add_key(record)
 
         if self.sparse_index_map.should_reorganize():
-            print("Automatic reorganisation")
+            logging.debug("Automatic reorganisation")
             self.do_reorganize("")
 
     def check_proper_order(self):
@@ -194,12 +177,21 @@ class SequentialDb(cmd.Cmd):
             if next_record.is_empty():
                 continue
             if cur_record.key >= next_record.key:
-                print("Values are not sorted proprely!!")
+                logging.debug("Values are not sorted proprely!!")
                 return
-        print("With proper order pass")
+        logging.debug("With proper order pass")
+
+    def do_tests(self, arg: str):
+        for record_num in range(10, 100001, 50000):
+            for alpha_val in range(1, 11, 5):
+                for reorog_val in range(1, 11, 5):
+                    config.ALPHA = alpha_val / 10
+                    config.REORGANIZATION_TRESHOLD = reorog_val / 10
+                    self.__init__()
+                    self.do_gen(str(record_num))
 
     def start(self):
         try:
             self.cmdloop()
         except KeyboardInterrupt:
-            print("\nExiting")
+            logging.info("\nExiting")

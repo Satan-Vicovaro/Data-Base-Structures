@@ -4,6 +4,7 @@ import secrets
 import random
 import struct
 from typing import dataclass_transform
+import logging
 
 from config import (
     DATA_SIZE,
@@ -163,7 +164,7 @@ class Page:
                 break
 
         if not updated:
-            print("Value does not exist!!!")
+            logging.debug("Value does not exist!!!")
 
     def exist(self, record: Record):
         return any(rec.key == record.key for rec in self.records)

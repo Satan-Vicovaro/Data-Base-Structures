@@ -1,3 +1,5 @@
+import logging
+from math import log
 from config import (
     INDEX_SIZE,
     INDEXES_PER_CHUNK,
@@ -51,10 +53,10 @@ class SparseIndexMap:
         return (FindPlaceStatus.IN_MIDDLE, place)
 
     def show_file(self):
-        print("Main:")
+        logging.info("Main:")
         self.main_file.show_file()
 
-        print("Overflow:")
+        logging.info("Overflow:")
         self.overflow_file.show_file()
 
     def proper_order_show(self):
@@ -62,7 +64,7 @@ class SparseIndexMap:
             if record.is_empty() or record.is_deleted():
                 continue
             indent = " " * depth
-            print(f"{indent} {record}")
+            logging.info(f"{indent} {record}")
 
     def initialize(self, record: Record, main_file: FileManager):
         self.sparseIndexes.append(SparseIndex(record.key, 0))
@@ -72,7 +74,7 @@ class SparseIndexMap:
         status, place = self.find_place(record.key)
 
         if status != FindPlaceStatus.IN_MIDDLE and status != FindPlaceStatus.KEY_EXSITS:
-            print("Can not update value")
+            logging.debug("Can not update value")
             return False
 
         page_status, closest_record = self.main_file.find_on_page(
@@ -120,7 +122,7 @@ class SparseIndexMap:
             self.initialize(record, self.main_file)
             return
         if status == FindPlaceStatus.KEY_EXSITS:
-            print("Key exsists, aborting")
+            logging.debug("Key exsists, aborting")
             return
         if status == FindPlaceStatus.SMALLEST_IN_FILE:
             self.__handle_smaller_insert(record, place)
@@ -143,11 +145,11 @@ class SparseIndexMap:
                 self.main_file.write_updated_page(self.main_file.cache_page)
 
             if page_status == PageFindStatus.VALUE_EXIST:
-                print("Value exsits, aborting")
+                logging.debug("Value exsits, aborting")
                 return
 
             if status == PageFindStatus.EMPTY_FILE:
-                print("Error: I should not be here!")
+                logging.debug("Error: I should not be here!")
                 return
 
     def find_record(self, key: int) -> Record | None:
@@ -195,7 +197,7 @@ class SparseIndexMap:
 
         if page_status == PageFindStatus.VALUE_EXIST:
             if closest_record.is_deleted():
-                print("Value already deleted")
+                logging.debug("Value already deleted")
                 return False
 
             if closest_record.is_empty():
@@ -211,7 +213,7 @@ class SparseIndexMap:
                     continue
 
                 if overflow_val.is_deleted():
-                    print("Value already deleted")
+                    logging.debug("Value already deleted")
                     return False
 
                 if overflow_val.is_empty():
