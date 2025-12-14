@@ -1,10 +1,28 @@
 import pathlib
 import re
+from src.IOManager import IOManager
 from src.Structs import Record
 from src.SparseIndexMap import FindPlaceStatus, SparseIndexMap
 from src.FileManager import FileManager, PageFindStatus
 import cmd
 from itertools import pairwise
+
+
+def count_io_operations(func):
+    def wrapper(*args, **kwargs):
+        read_count_before = IOManager.total_read_count
+        write_count_before = IOManager.total_write_count
+        result = func(*args, **kwargs)
+
+        read_count_after = IOManager.total_read_count
+        write_count_after = IOManager.total_write_count
+
+        print(f"Reads: {read_count_after - read_count_before}")
+        print(f"Writes: {write_count_after - write_count_before}")
+
+        return result
+
+    return wrapper
 
 
 class SequentialDb(cmd.Cmd):
@@ -21,6 +39,7 @@ class SequentialDb(cmd.Cmd):
     def do_proper_show(self, arg: str):
         self.sparse_index_map.proper_order_show()
 
+    @count_io_operations
     def do_gen(self, arg: str):
         if arg == "":
             return
@@ -30,6 +49,7 @@ class SequentialDb(cmd.Cmd):
             print(f"genenerating:{rand_record}")
             self.add_key(rand_record)
 
+    @count_io_operations
     def do_add_key(self, arg: str):
         key, data = arg.split(" ", maxsplit=2)
         self.add_key(Record(int(key), str(data)))
@@ -42,6 +62,7 @@ class SequentialDb(cmd.Cmd):
         print("bye")
         return True
 
+    @count_io_operations
     def do_delete(self, arg: str):
         result = self.sparse_index_map.delete_record(int(arg))
         if result:
@@ -49,11 +70,13 @@ class SequentialDb(cmd.Cmd):
         else:
             print("Could not delete")
 
+    @count_io_operations
     def do_update(self, arg: str):
         key, value = arg.split(" ", maxsplit=2)
         self.sparse_index_map.update_record(Record(int(key), value))
         # self.sparse_index_map
 
+    @count_io_operations
     def do_find(self, arg: str):
         record = self.sparse_index_map.find_record(int(arg))
         if record is None:

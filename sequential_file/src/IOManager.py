@@ -41,6 +41,7 @@ class IOManager:
             f.write("")
 
     def read_page(self, page_index=0):
+        IOManager.total_read_count += 1
         with open(self.filename, "r+b", buffering=self.chunk_size) as f:
             f.seek(page_index * self.chunk_size)
             raw_data = f.read(self.chunk_size)
@@ -54,6 +55,8 @@ class IOManager:
         return Page(data_list, page_index, self.filename)
 
     def read_last_page(self):
+        IOManager.total_read_count += 1
+
         file_stats = pathlib.Path(self.filename).stat()
         page_index = file_stats.st_size // self.chunk_size
 
@@ -74,6 +77,7 @@ class IOManager:
         return math.ceil(file_stats.st_size / self.chunk_size)
 
     def chunk_read(self, start: int = 0):
+        IOManager.total_read_count += 1
         with open(self.filename, "r+b", buffering=self.chunk_size) as f:
             f.seek(start)
             raw_data = f.read(self.chunk_size)
@@ -99,12 +103,15 @@ class IOManager:
                 yield record
 
     def write_page(self, page: Page):
+        IOManager.total_write_count += 1
         byte_data = bytearray(data for record in page.records for data in bytes(record))
         with open(self.filename, "r+b", buffering=self.chunk_size) as f:
             f.seek(page.page_index * self.chunk_size)
             f.write(byte_data)
 
     def write_last_page(self, page: Page):
+        IOManager.total_write_count += 1
+
         file_stats = pathlib.Path(self.filename).stat()
         page_index = file_stats.st_size // self.chunk_size
         byte_data = bytearray(data for record in page.records for data in bytes(record))
@@ -113,8 +120,22 @@ class IOManager:
             f.write(byte_data)
 
     def append_to_file(self, page: Page) -> int:
+        IOManager.total_write_count += 1
 
         byte_data = bytearray(data for record in page.records for data in bytes(record))
+
+        file_stats = pathlib.Path(self.filename).stat()
+        page_index = file_stats.st_size // self.chunk_size
+
+        with open(self.filename, "a+b", buffering=self.chunk_size) as f:
+            f.write(byte_data)
+
+        return page_index
+
+    def append_chunk_to_file(self, chunk):
+        IOManager.total_write_count += 1
+
+        byte_data = bytearray(data for record in chunk for data in bytes(record))
 
         file_stats = pathlib.Path(self.filename).stat()
         page_index = file_stats.st_size // self.chunk_size
