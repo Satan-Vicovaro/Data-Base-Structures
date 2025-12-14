@@ -125,8 +125,13 @@ class FileManager:
 
         overflow_ptr -= 1
         page_index = overflow_ptr // RECORDS_PER_CHUNK
+
         if page_index != self.cache_page.page_index:
             self.cache_page = self.io_manager.read_page(page_index)
+
+        if self.cache_page.size() == 0:
+            print("Error: cache is empty")
+            return self.cache_page, Record.empty_record()
 
         record_index = overflow_ptr % RECORDS_PER_CHUNK
         record = self.cache_page.records[record_index]
@@ -185,8 +190,12 @@ class FileManager:
         self.io_manager.delete()
         self.io_manager = self.new_file
         self.io_manager.rename(proper_name)
+        self.cache_page = self.io_manager.read_page(0)
         del self.new_file
         del self.output_buffer
+
+    def reset_cache(self):
+        self.cache_page = Page([], 0, self.file_name)
 
     def truncate_file(self):
         self.io_manager.truncate()

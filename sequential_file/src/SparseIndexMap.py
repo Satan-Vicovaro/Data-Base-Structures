@@ -202,7 +202,7 @@ class SparseIndexMap:
                 return False
 
             closest_record.mark_as_deleted()
-            self.main_file.update_record(closest_record)
+            self.main_file.write_updated_page(self.main_file.cache_page)
             return True
 
         if page_status == PageFindStatus.IN_OVERFLOW:
@@ -210,11 +210,11 @@ class SparseIndexMap:
                 if overflow_val.key != key:
                     continue
 
-                if closest_record.is_deleted():
+                if overflow_val.is_deleted():
                     print("Value already deleted")
                     return False
 
-                if closest_record.is_empty():
+                if overflow_val.is_empty():
                     return False
 
                 overflow_val.mark_as_deleted()
@@ -341,5 +341,6 @@ class SparseIndexMap:
             new_spare_indexes.clear()
 
         self.main_file.switch_to_new_file()
+        self.overflow_file.reset_cache()
         self.overflow_file.truncate_file()
         self.sparseIndexes = list(self.io_manager.read_whole_file())
