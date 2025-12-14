@@ -6,24 +6,29 @@ import struct
 from typing import dataclass_transform
 import logging
 
-from config import (
-    DATA_SIZE,
-    OVERFLOW_PTR_SIZE,
-    PAGE_KEY_SIZE,
-    RAND_KEY_SIZE,
-    RECORD_SIZE,
-    RECORDS_PER_CHUNK,
-)
+import config as c
+
+# from config import (
+#     DATA_SIZE,
+#     OVERFLOW_PTR_SIZE,
+#     PAGE_KEY_SIZE,
+#     RAND_KEY_SIZE,
+#     RECORD_SIZE,
+#     RECORDS_PER_CHUNK,
+# )
+
+# random.seed(42)
 
 
 def random_key_gen() -> int:
-    return secrets.randbits(RAND_KEY_SIZE * 8)
+    # return random.getrandbits(c.RAND_KEY_SIZE * 8)
+    return secrets.randbits(c.RAND_KEY_SIZE * 8)
 
 
 class Data:
-    record_size = DATA_SIZE
+    record_size = c.DATA_SIZE
 
-    def __init__(self, value: str = "C" * DATA_SIZE) -> None:
+    def __init__(self, value: str = "C" * c.DATA_SIZE) -> None:
         if isinstance(value, int):
             value = str(value)
         self.value = value[: self.record_size].ljust(self.record_size, "C")
@@ -64,17 +69,17 @@ class Record:
             self.overflow_ptr = overflow_ptr
 
     def __bytes__(self) -> bytes:
-        fmt = f"{RAND_KEY_SIZE}s{DATA_SIZE}s{OVERFLOW_PTR_SIZE}s"
+        fmt = f"{c.RAND_KEY_SIZE}s{c.DATA_SIZE}s{c.OVERFLOW_PTR_SIZE}s"
         return struct.pack(
             fmt,
-            self.key.to_bytes(RAND_KEY_SIZE, byteorder="little"),
+            self.key.to_bytes(c.RAND_KEY_SIZE, byteorder="little"),
             bytes(self.data),
-            self.overflow_ptr.to_bytes(OVERFLOW_PTR_SIZE, byteorder="little"),
+            self.overflow_ptr.to_bytes(c.OVERFLOW_PTR_SIZE, byteorder="little"),
         )
 
     @classmethod
     def from_bytes(cls, record_list: bytes):
-        fmt = f"{RAND_KEY_SIZE}s{DATA_SIZE}s{OVERFLOW_PTR_SIZE}s"
+        fmt = f"{c.RAND_KEY_SIZE}s{c.DATA_SIZE}s{c.OVERFLOW_PTR_SIZE}s"
         key, data_bytes, overflow_ptr = struct.unpack(fmt, record_list)
         return Record(
             int.from_bytes(key, "little"),
@@ -92,24 +97,24 @@ class Record:
     @classmethod
     def empty_record(cls):
         key = 0
-        data = Data("C" * DATA_SIZE)
+        data = Data("C" * c.DATA_SIZE)
         overflow_ptr = 0
         return Record(key, data, overflow_ptr)
 
     def is_empty(self) -> bool:
         if (
             self.key == 0
-            and self.data.value == "C" * DATA_SIZE
+            and self.data.value == "C" * c.DATA_SIZE
             and self.overflow_ptr == 0
         ):
             return True
         return False
 
     def mark_as_deleted(self):
-        self.data.value = "C" * DATA_SIZE
+        self.data.value = "C" * c.DATA_SIZE
 
     def is_deleted(self) -> bool:
-        if self.key != 0 and self.data.value == "C" * DATA_SIZE:
+        if self.key != 0 and self.data.value == "C" * c.DATA_SIZE:
             return True
         return False
 
@@ -127,18 +132,18 @@ class SparseIndex:
 
     @classmethod
     def from_bytes(cls, sparse_index_bytes: bytes):
-        fmt = f"{RAND_KEY_SIZE}s{PAGE_KEY_SIZE}s"
+        fmt = f"{c.RAND_KEY_SIZE}s{c.PAGE_KEY_SIZE}s"
         key, page_index = struct.unpack(fmt, sparse_index_bytes)
         return SparseIndex(
             int.from_bytes(key, "little"), int.from_bytes(page_index, "little")
         )
 
     def __bytes__(self) -> bytes:
-        fmt = f"{RAND_KEY_SIZE}s{PAGE_KEY_SIZE}s"
+        fmt = f"{c.RAND_KEY_SIZE}s{c.PAGE_KEY_SIZE}s"
         return struct.pack(
             fmt,
-            self.key.to_bytes(RAND_KEY_SIZE, byteorder="little"),
-            self.page_index.to_bytes(PAGE_KEY_SIZE, byteorder="little"),
+            self.key.to_bytes(c.RAND_KEY_SIZE, byteorder="little"),
+            self.page_index.to_bytes(c.PAGE_KEY_SIZE, byteorder="little"),
         )
 
     def __str__(self) -> str:
@@ -197,7 +202,7 @@ class Page:
         )
         self.records.insert(index, record)
 
-        if len(self.records) == RECORDS_PER_CHUNK + 1:
+        if len(self.records) == c.RECORDS_PER_CHUNK + 1:
             self.records.pop()
 
     def can_insert(self) -> bool:
@@ -205,7 +210,7 @@ class Page:
             if record.is_empty():
                 return True
 
-        if len(self.records) < RECORDS_PER_CHUNK:
+        if len(self.records) < c.RECORDS_PER_CHUNK:
             return True
 
         return False

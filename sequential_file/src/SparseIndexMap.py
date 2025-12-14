@@ -1,11 +1,13 @@
 import logging
 from math import log
-from config import (
-    INDEX_SIZE,
-    INDEXES_PER_CHUNK,
-    REORGANIZATION_TRESHOLD,
-    SPARSE_INDEX_CHUNK_SIZE,
-)
+import config as c
+
+# from config import (
+#     INDEX_SIZE,
+#     INDEXES_PER_CHUNK,
+#     REORGANIZATION_TRESHOLD,
+#     SPARSE_INDEX_CHUNK_SIZE,
+# )
 from src.FileManager import FileManager, PageFindStatus
 from src.Structs import Page, Record, SparseIndex
 from src.IOManager import IOManager
@@ -26,8 +28,8 @@ class SparseIndexMap:
         self.io_manager = IOManager(
             SparseIndex,
             "sparse_index_map.bin",
-            chunk_size=SPARSE_INDEX_CHUNK_SIZE,
-            record_size=INDEX_SIZE,
+            chunk_size=c.SPARSE_INDEX_CHUNK_SIZE,
+            record_size=c.INDEX_SIZE,
         )
         self.sparseIndexes: list[SparseIndex] = []
         self.isFull = True
@@ -313,7 +315,7 @@ class SparseIndexMap:
         main_file_size = self.main_file.get_next_overflow_ptr() - 1
         of_file_size = self.overflow_file.get_next_overflow_ptr() - 1
 
-        return of_file_size / main_file_size > REORGANIZATION_TRESHOLD
+        return of_file_size / main_file_size > c.REORGANIZATION_TRESHOLD
 
     def reorganize(self):
         self.main_file.init_new_file()
@@ -331,7 +333,7 @@ class SparseIndexMap:
             if smallest_key_on_page is not None and page_index is not None:
                 new_spare_indexes.append(SparseIndex(smallest_key_on_page, page_index))
 
-                if len(new_spare_indexes) > INDEXES_PER_CHUNK:
+                if len(new_spare_indexes) > c.INDEXES_PER_CHUNK:
                     self.io_manager.append_chunk_to_file(new_spare_indexes)
                     new_spare_indexes.clear()
 

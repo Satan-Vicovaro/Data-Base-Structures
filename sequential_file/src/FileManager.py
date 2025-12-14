@@ -2,11 +2,9 @@ import bisect
 from enum import Enum
 import logging
 import math
-from pathlib import PosixPath
-from re import finditer
-import re
-from typing import IO, Self
-from config import ALPHA, CHUNK_SIZE, RECORD_SIZE, RECORDS_PER_CHUNK
+import config as c
+
+# from config import ALPHA, CHUNK_SIZE, RECORD_SIZE, RECORDS_PER_CHUNK
 from src.Structs import Page, Record
 from src.IOManager import IOManager
 
@@ -24,13 +22,19 @@ class FileManager:
     def __init__(self, file_name) -> None:
         self.file_name = file_name
         self.io_manager = IOManager(
-            Record, filename=file_name, chunk_size=CHUNK_SIZE, record_size=RECORD_SIZE
+            Record,
+            filename=file_name,
+            chunk_size=c.CHUNK_SIZE,
+            record_size=c.RECORD_SIZE,
         )
         self.cache_page: Page = Page([], 0, file_name)
         self.cache_page_known_values: dict[int, int] = {}  # [ Record.key, index ]
         self.all_pages_full = True
-        assert 0 < ALPHA <= 1, "alpha should be in range (0,1]"
-        self.alpha = ALPHA
+        assert 0 < c.ALPHA <= 1, "alpha should be in range (0,1]"
+        self.alpha = c.ALPHA
+        # logging.warning(f"alpha is: {self.alpha}")
+        # logging.warning(f"chunk is: {c.CHUNK_SIZE}")
+        # logging.warning(f"record_size is {c.RECORD_SIZE}")
 
     def show_file(self):
         for i, record in enumerate(self.io_manager.read_whole_file()):
@@ -125,7 +129,7 @@ class FileManager:
             return self.cache_page, Record.empty_record()
 
         overflow_ptr -= 1
-        page_index = overflow_ptr // RECORDS_PER_CHUNK
+        page_index = overflow_ptr // c.RECORDS_PER_CHUNK
 
         if page_index != self.cache_page.page_index:
             self.cache_page = self.io_manager.read_page(page_index)
@@ -134,7 +138,7 @@ class FileManager:
             logging.debug("Error: cache is empty")
             return self.cache_page, Record.empty_record()
 
-        record_index = overflow_ptr % RECORDS_PER_CHUNK
+        record_index = overflow_ptr % c.RECORDS_PER_CHUNK
         record = self.cache_page.records[record_index]
 
         return self.cache_page, record
@@ -156,18 +160,18 @@ class FileManager:
         self.new_file = IOManager(
             Record,
             "new_" + self.file_name,
-            chunk_size=CHUNK_SIZE,
-            record_size=RECORD_SIZE,
+            chunk_size=c.CHUNK_SIZE,
+            record_size=c.RECORD_SIZE,
         )
         self.output_buffer: list[Record] = []
 
     def aggreate_append_to_new_file(self, record: Record):
         record.overflow_ptr = 0
         self.output_buffer.append(record)
-        max_record_num = math.ceil(RECORDS_PER_CHUNK * self.alpha)
+        max_record_num = math.ceil(c.RECORDS_PER_CHUNK * self.alpha)
         if len(self.output_buffer) >= max_record_num:
 
-            for _ in range(RECORDS_PER_CHUNK - max_record_num):
+            for _ in range(c.RECORDS_PER_CHUNK - max_record_num):
                 self.output_buffer.append(Record.empty_record())
 
             page_index = self.new_file.append_to_file(Page(self.output_buffer, 0, ""))

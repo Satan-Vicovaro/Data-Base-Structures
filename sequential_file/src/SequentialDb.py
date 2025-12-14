@@ -1,6 +1,5 @@
-import pathlib
+from os import write
 import random
-import re
 import config
 from src.IOManager import IOManager
 from src.Structs import Record
@@ -8,6 +7,9 @@ from src.SparseIndexMap import FindPlaceStatus, SparseIndexMap
 from src.FileManager import FileManager, PageFindStatus
 import cmd
 from itertools import pairwise
+
+import matplotlib.pyplot as plt
+import numpy as np
 import time
 
 import logging
@@ -147,8 +149,21 @@ class SequentialDb(cmd.Cmd):
         for key in key_added.keys():
             self.sparse_index_map.delete_record(key)
 
-        self.do_show("")
-        self.do_proper_show("")
+        # self.do_show("")
+        # self.do_proper_show("")
+
+    def __add_n_keys(self, record_num: int):
+        key_added = {}
+        for _ in range(record_num):
+            rand_record = Record.random_record()
+            key_added[rand_record.key] = rand_record
+            self.add_key(rand_record)
+
+        return key_added
+
+    def __delete_inserted_keys(self, key_added):
+        for key in key_added.keys():
+            self.sparse_index_map.delete_record(key)
 
     def do_ar(self, arg: str):
         self.add_key(Record.random_record())
@@ -182,13 +197,188 @@ class SequentialDb(cmd.Cmd):
         logging.debug("With proper order pass")
 
     def do_tests(self, arg: str):
-        for record_num in range(10, 100001, 50000):
-            for alpha_val in range(1, 11, 5):
-                for reorog_val in range(1, 11, 5):
-                    config.ALPHA = alpha_val / 10
-                    config.REORGANIZATION_TRESHOLD = reorog_val / 10
-                    self.__init__()
-                    self.do_gen(str(record_num))
+        data1 = []
+        write_arr = []
+        delete_arr = []
+        # for record_num in range(10000, 20001, 250):
+        for alpha_val in range(1, 101, 5):
+            for reorog_val in range(1, 20, 1):
+                data1.append(self.__single_gen_test(alpha_val, reorog_val, 7500))
+
+                write_data, keys_added = self.__single_add_test(
+                    alpha_val, reorog_val, 7500
+                )
+                delete_data = self.__single_delete_test(
+                    alpha_val, reorog_val, 7500, keys_added
+                )
+                write_arr.append(write_data)
+                delete_arr.append(delete_data)
+
+        with open("data1.txt", "w+") as f:
+            for read, write, dur, r_num, alph, reorg in data1:
+                f.write(f"{read},{write},{dur:.2f},{r_num},{alph},{reorg}\n")
+
+        with open("write1.txt", "w+") as f:
+            for read, write, dur, r_num, alph, reorg in write_arr:
+                f.write(f"{read},{write},{dur:.2f},{r_num},{alph},{reorg}\n")
+
+        with open("delete1.txt", "w+") as f:
+            for read, write, dur, r_num, alph, reorg in delete_arr:
+                f.write(f"{read},{write},{dur:.2f},{r_num},{alph},{reorg}\n")
+
+    def __single_gen_test(self, alpha_val, reorog_val, record_num):
+        config.ALPHA = alpha_val / 100
+        config.REORGANIZATION_TRESHOLD = reorog_val / 10
+        time_before = time.time()
+        read_count_before = IOManager.total_read_count
+        write_count_before = IOManager.total_write_count
+
+        # importlib.reload(config)
+
+        random.seed(23456)
+        self.reinit()
+        self.do_gen(str(record_num))
+
+        time_after = time.time()
+        read_count_after = IOManager.total_read_count
+        write_count_after = IOManager.total_write_count
+
+        duration_time = time_after - time_before
+        read_ops = read_count_after - read_count_before
+        write_ops = write_count_after - write_count_before
+        return (
+            read_ops,
+            write_ops,
+            duration_time,
+            record_num,
+            config.ALPHA,
+            config.REORGANIZATION_TRESHOLD,
+        )
+
+    def __single_add_test(self, alpha_val, reorog_val, record_num):
+        config.ALPHA = alpha_val / 100
+        config.REORGANIZATION_TRESHOLD = reorog_val / 10
+        time_before = time.time()
+        read_count_before = IOManager.total_read_count
+        write_count_before = IOManager.total_write_count
+
+        keys_added = self.__add_n_keys(5000)
+
+        time_after = time.time()
+        read_count_after = IOManager.total_read_count
+        write_count_after = IOManager.total_write_count
+
+        duration_time = time_after - time_before
+        read_ops = read_count_after - read_count_before
+        write_ops = write_count_after - write_count_before
+        return (
+            read_ops,
+            write_ops,
+            duration_time,
+            record_num,
+            config.ALPHA,
+            config.REORGANIZATION_TRESHOLD,
+        ), keys_added
+
+    def __single_delete_test(self, alpha_val, reorog_val, record_num, keys_added):
+        config.ALPHA = alpha_val / 100
+        config.REORGANIZATION_TRESHOLD = reorog_val / 10
+        time_before = time.time()
+        read_count_before = IOManager.total_read_count
+        write_count_before = IOManager.total_write_count
+
+        self.__delete_inserted_keys(keys_added)
+        time_after = time.time()
+        read_count_after = IOManager.total_read_count
+        write_count_after = IOManager.total_write_count
+
+        duration_time = time_after - time_before
+        read_ops = read_count_after - read_count_before
+        write_ops = write_count_after - write_count_before
+        return (
+            read_ops,
+            write_ops,
+            duration_time,
+            record_num,
+            config.ALPHA,
+            config.REORGANIZATION_TRESHOLD,
+        )
+
+    def __single_find_test(self, alpha_val, reorog_val, record_num):
+        config.ALPHA = alpha_val / 100
+        config.REORGANIZATION_TRESHOLD = reorog_val / 10
+        time_before = time.time()
+        read_count_before = IOManager.total_read_count
+        write_count_before = IOManager.total_write_count
+
+        # importlib.reload(config)
+        self.do_test_add_and_delete_all_record(str(5000))
+
+        time_after = time.time()
+        read_count_after = IOManager.total_read_count
+        write_count_after = IOManager.total_write_count
+
+        duration_time = time_after - time_before
+        read_ops = read_count_after - read_count_before
+        write_ops = write_count_after - write_count_before
+        return (
+            read_ops,
+            write_ops,
+            duration_time,
+            record_num,
+            config.ALPHA,
+            config.REORGANIZATION_TRESHOLD,
+        )
+
+    def do_generate_plots(self, arg: str):
+        x = []
+        y = []
+        z = []
+        with open("write.txt") as f:
+            for line in f:
+                parts = line.strip().split(",")
+                read_val = int(parts[0])
+                write_val = int(parts[1])
+                dur_val = float(parts[2])  # Safe to convert now
+                r_num_val = int(parts[3])
+                alph_val = float(parts[4])  # Keep as string (or float if it's a number)
+                reorg_val = float(parts[5])
+                x.append(alph_val)
+                y.append(reorg_val)
+                z.append(write_val)
+
+        plt.figure(figsize=(8, 6))
+
+        contour = plt.tricontourf(x, y, z, levels=100, cmap="viridis")
+        cbar = plt.colorbar(contour)
+        cbar.set_label("Write Cost [n]")
+
+        plt.scatter(x, y, c="black", s=5, alpha=0.5)
+
+        plt.xlabel("Alpha coef")
+        plt.ylabel("Reorg coef")
+        plt.title("Appending 5000 records")
+
+        plt.show()
+
+    def do_count_averages(self, arg: str):
+        x = []
+        write = []
+        read = []
+        with open("delete.txt") as f:
+            for line in f:
+                parts = line.strip().split(",")
+                read_val = int(parts[0])
+                write_val = int(parts[1])
+                dur_val = float(parts[2])  # Safe to convert now
+                r_num_val = int(parts[3])
+                alph_val = float(parts[4])  # Keep as string (or float if it's a number)
+                reorg_val = float(parts[5])
+                x.append(alph_val)
+                write.append(write_val)
+                read.append(read_val)
+        print(f"avg read operation: {sum(read) / (20 * 19 * 5000)}")
+        print(f"avg write operation: {sum(write) / (20 * 19 * 5000)}")
 
     def start(self):
         try:

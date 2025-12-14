@@ -4,7 +4,10 @@ from os import set_blocking
 import pathlib
 import math
 from typing import List
-from config import CHUNK_SIZE, RECORD_SIZE
+import config as c
+
+# from config import CHUNK_SIZE, RECORD_SIZE
+# from sequential_file.config import RECORDS_PER_CHUNK
 from src.Structs import Page, Record
 
 
@@ -23,7 +26,7 @@ class IOManager:
         self.chunk_size = chunk_size
         self.record_size = record_size
         self.target_class = target_class
-
+        # logging.warning(f"records per chunk:{c.RECORDS_PER_CHUNK}")
         # if not pathlib.Path(filename).exists():
         with open(filename, "w") as f:
             f.write("")
