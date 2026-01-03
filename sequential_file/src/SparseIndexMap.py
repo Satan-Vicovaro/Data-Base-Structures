@@ -68,6 +68,10 @@ class SparseIndexMap:
             indent = " " * depth
             logging.info(f"{indent} {record}")
 
+    def show_index(self):
+        for index in self.sparseIndexes:
+            print(index)
+
     def initialize(self, record: Record, main_file: FileManager):
         self.sparseIndexes.append(SparseIndex(record.key, 0))
         main_file.initialize(record)
@@ -91,6 +95,8 @@ class SparseIndexMap:
                 if overflow_val.key != record.key:
                     continue
                 if closest_record.is_empty():
+                    return False
+                if closest_record.is_deleted():
                     return False
 
                 overflow_val.data = record.data

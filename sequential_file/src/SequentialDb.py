@@ -1,5 +1,6 @@
 from os import write
 import random
+import re
 import config
 from src.IOManager import IOManager
 from src.Structs import Record
@@ -65,7 +66,12 @@ class SequentialDb(cmd.Cmd):
 
     @count_io_operations
     def do_add_key(self, arg: str):
-        key, data = arg.split(" ", maxsplit=2)
+        try:
+            key, data = arg.split(" ", maxsplit=2)
+        except:
+            print("Invalid input data")
+            return
+
         self.add_key(Record(int(key), str(data)))
 
     def do_help(self, arg: str) -> bool | None:
@@ -167,6 +173,9 @@ class SequentialDb(cmd.Cmd):
 
     def do_ar(self, arg: str):
         self.add_key(Record.random_record())
+
+    def do_sparse_index_show(self, arg: str):
+        self.sparse_index_map.show_index()
 
     def do_reorganize(self, arg: str):
         self.sparse_index_map.reorganize()
